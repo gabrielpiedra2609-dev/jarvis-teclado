@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- 🔷 MÓDULO 1: ENCABEZADO Y ESTILOS -->
+  <meta charset="UTF-8">
+  <title>Interfaz de Mirada + Calibración + Teclado</title>
+
+  <!-- 🔧 PWA: Manifest y Service Worker -->
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log("✅ Service Worker registrado"))
+        .catch(error => console.error("❌ Error al registrar Service Worker:", error));
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #F0F4F8;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #visor {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    video, canvas {
+      border: 2px solid #007BFF;
+      border-radius: 8px;
+    }
+
+    #estado {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    #pantallaTexto {
+      width: 90%;
+      max-width: 700px;
+      height: 100px;
+      font-size: 1.4em;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 2px solid #007BFF;
+      border-radius: 8px;
+      background-color: #FFFFFF;
+      color: #333;
+      resize: none;
+    }
+
+    .bloque {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tecla {
+      font-size: 1.2em;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: white;
+      min-width: 50px;
+      position: relative;
+    }
+
+    .rojo    { background-color: #E74C3C; }
+    .morado  { background-color: #8E44AD; }
+    .amarillo{ background-color: #F1C40F; color: #333; }
+    .verde   { background-color: #27AE60; }
+    .azul    { background-color: #3498DB; }
+
+    .cursor {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2em;
+      color: black;
+    }
+
+    #pantallaInicio {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #fff;
+      z-index: 999;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔷 MÓDULO 2: INTERFAZ DE CÁMARA Y VISOR -->
+  <h1>🧠 Interfaz de Mirada</h1>
+  <div id="visor">
+    <video id="video" autoplay playsinline width="480" height="360"></video>
+    <canvas id="canvas" width="480" height="360" style="position: absolute; top: 0; left: 0;"></canvas>
+  </div>
+  <div id="estado">Esperando inicio...</div>
+  <div id="pantallaInicio"><h2>👋 Toca para comenzar</h2></div>
+
+  <!-- 🔷 MÓDULO 3: TECLADO POR BLOQUES -->
+  <textarea id="pantallaTexto" readonly></textarea>
+  <div style="margin-bottom: 20px;">
+    <button onclick="copiarTexto()">📋 Copiar todo</button>
+    <button onclick="borrarTodo()">🗑️ Borrar todo</button>
+  </div>
+
+
+  <!-- 🔴 Bloque rojo: vocales -->
+  <div id="bloque-rojo" class="bloque">
+    <button class="tecla rojo">a</button>
+    <button class="tecla rojo">e</button>
+    <button class="tecla rojo">i</button>
+    <button class="tecla rojo">o</button>
+    <button class="tecla rojo">u</button>
+  </div>
+
+  <!-- 🟣 Bloque morado -->
+  <div id="bloque-morado" class="bloque">
+    <button class="tecla morado">q</button>
+    <button class="tecla morado">w</button>
+    <button class="tecla morado">r</button>
+    <button class="tecla morado">t</button>
+    <button class="tecla morado">y</button>
+    <button class="tecla morado">p</button>
+  </div>
+
+  <!-- 🟡 Bloque amarillo -->
+  <div id="bloque-amarillo" class="bloque">
+    <button class="tecla amarillo">s</button>
+    <button class="tecla amarillo">d</button>
+    <button class="tecla amarillo">f</button>
+    <button class="tecla amarillo">g</button>
+    <button class="tecla amarillo">h</button>
+    <button class="tecla amarillo">j</button>
+    <button class="tecla amarillo">k</button>
+    <button class="tecla amarillo">l</button>
+    <button class="tecla amarillo">ñ</button>
+  </div>
+
+  <!-- 🟢 Bloque verde -->
+  <div id="bloque-verde" class="bloque">
+    <button class="tecla verde">z</button>
+    <button class="tecla verde">x</button>
+    <button class="tecla verde">c</button>
+    <button class="tecla verde">v</button>
+    <button class="tecla verde">b</button>
+    <button class="tecla verde">n</button>
+    <button class="tecla verde">m</button>
+  </div>
+
+  <!-- 🔵 Bloque azul actualizado -->
+  <div id="bloque-azul" class="bloque">
+    <button class="tecla azul"> </button>
+    <button class="tecla azul">borrar</button>
+    <button class="tecla azul">,</button>
+    <button class="tecla azul">?</button>
+    <button class="tecla azul">!</button>
+    <button class="tecla azul">leer</button>
+  </div>
+
+  <!-- 🔷 MÓDULO 4: LIBRERÍAS -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+  <!-- 🔷 MÓDULO 5: FUNCIONES Y FLUJO -->
+  <script>
+    // 📦 VARIABLES GLOBALES EXPORTABLES
+    const videoElement = document.getElementById('video');
+    const canvasElement = document.getElementById('canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+    const estadoDiv = document.getElementById('estado');
+    const irisIndices = [468, 469, 470, 471];
+
+    let ultimoYNormalizado = null;
+    let flujoIniciado = false;
+    let esperaRostro = false;
+    let modeloCalibrado = null;
+
+    let indiceActual = 0;
+    let teclasActuales = [];
+    let cursorActivo = null;
+    let intervaloRecorrido = null;
+
+    // 🔧 AUDIO Y ENTRADA MANUAL
+    function verificarAudio() {
+      const prueba = new SpeechSynthesisUtterance(" ");
+      speechSynthesis.speak(prueba);
+    }
+
+    function reproducirPalabra(texto) {
+      return new Promise(resolve => {
+        const utterance = new SpeechSynthesisUtterance(texto);
+        utterance.onend = resolve;
+        utterance.onerror = resolve;
+        speechSynthesis.speak(utterance);
+        setTimeout(resolve, 3000);
+      });
+    }
+
+    document.getElementById('pantallaInicio').addEventListener('click', () => {
+      document.getElementById('pantallaInicio').style.display = 'none';
+      verificarAudio();
+      esperaRostro = true;
+      estadoDiv.textContent = "📷 Esperando detección facial...";
+    });
+    // Funcion copiar y borrar todo
+    
+    function presionarTecla(tecla) {
+      const pantalla = document.getElementById("pantallaTexto");
+      pantalla.value += tecla;
+    }
+
+    function borrarUltimo() {
+      const pantalla = document.getElementById("pantallaTexto");
+      pantalla.value = pantalla.value.slice(0, -1);
+    }
+
+    function copiarTexto() {
+      const texto = document.getElementById("pantallaTexto").value;
+      navigator.clipboard.writeText(texto)
+        .then(() => alert("Texto copiado al portapapeles"));
+    }
+
+    function borrarTodo() {
+      if (confirm("¿Deseas borrar todo el texto?")) {
+        document.getElementById("pantallaTexto").value = "";
+      }
+    }
+
+
+    // 🔧 DETECCIÓN Y CALIBRACIÓN
+
+    function probabilidadNormal(x, mu, sigma) {
+      if (sigma === 0) return 0;
+      const coef = 1 / (Math.sqrt(2 * Math.PI) * sigma);
+      const exponencial = Math.exp(-((x - mu) ** 2) / (2 * sigma ** 2));
+      return coef * exponencial;
+    }
+
+    function calcularYNormalizado(landmarks) {
+      try {
+        const yCeja = landmarks[10].y;
+        const yBarbilla = landmarks[152].y;
+        const alturaRostro = Math.abs(yBarbilla - yCeja);
+        if (alturaRostro < 0.1) return null;
+        const ys = irisIndices.map(i => landmarks[i].y);
+        const yPromedio = ys.reduce((a, b) => a + b, 0) / ys.length;
+        return (yPromedio - yCeja) / alturaRostro;
+      } catch {
+        return null;
+      }
+    }
+
+    async function esperar(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function capturarMuestras(etiqueta, duracion = 3000) {
+      estadoDiv.textContent = `🔊 Mira hacia ${etiqueta}`;
+      await reproducirPalabra(`Por favor, mira hacia ${etiqueta} y mantén la mirada`);
+      estadoDiv.textContent = `📸 Capturando muestras: ${etiqueta}`;
+      const muestras = [];
+      const inicio = Date.now();
+      while (Date.now() - inicio < duracion) {
+        if (ultimoYNormalizado !== null) {
+          muestras.push(ultimoYNormalizado);
+          console.log(`Muestra ${etiqueta}:`, ultimoYNormalizado);
+        }
+        await esperar(100);
+      }
+      return muestras;
+    }
+
+    async function calibrarProbabilistico() {
+      const arriba = await capturarMuestras("arriba");
+      const abajo = await capturarMuestras("abajo");
+      if (arriba.length < 5 || abajo.length < 5) return null;
+      const media = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+      const std = arr => Math.sqrt(arr.map(x => (x - media(arr)) ** 2).reduce((a, b) => a + b, 0) / arr.length);
+      return {
+        arriba: { media: media(arriba), std: std(arriba) },
+        abajo: { media: media(abajo), std: std(abajo) }
+      };
+    }
+
+    async function interpretarMiradaUnaVez(modelo) {
+      const yVals = [];
+      const inicio = Date.now();
+      while (Date.now() - inicio < 3000) {
+        if (ultimoYNormalizado !== null) yVals.push(ultimoYNormalizado);
+        await esperar(100);
+      }
+      if (yVals.length === 0) return 'x';
+      const yMedio = yVals.reduce((a, b) => a + b, 0) / yVals.length;
+      const pArriba = probabilidadNormal(yMedio, modelo.arriba.media, modelo.arriba.std);
+      const pAbajo = probabilidadNormal(yMedio, modelo.abajo.media, modelo.abajo.std);
+      if (pArriba > pAbajo && pArriba > 0.01) return '1';
+      if (pAbajo > pArriba && pAbajo > 0.01) return '0';
+      return 'x';
+    }
+
+    // 🔧 TECLADO INTERACTIVO
+    function presionarTecla(tecla) {
+      const pantalla = document.getElementById("pantallaTexto");
+      pantalla.value += tecla;
+    }
+
+    function borrarUltimo() {
+      const pantalla = document.getElementById("pantallaTexto");
+      pantalla.value = pantalla.value.slice(0, -1);
+    }
+
+    function leerTextoCompleto() {
+      const texto = document.getElementById("pantallaTexto").value.trim();
+      if (texto.length === 0) {
+        estadoDiv.textContent = "📭 No hay texto para leer";
+        reproducirPalabra("No hay texto para leer");
+        return;
+      }
+      estadoDiv.textContent = "🔊 Leyendo texto...";
+      reproducirPalabra(texto);
+    }
+    
+    function iniciarRecorridoBloque(bloqueId) {
+      detenerRecorrido();
+      const bloque = document.getElementById(bloqueId);
+      teclasActuales = Array.from(bloque.querySelectorAll(".tecla"));
+      indiceActual = 0;
+      intervaloRecorrido = setInterval(() => {
+        mostrarCursorEn(indiceActual);
+        indiceActual = (indiceActual + 1) % teclasActuales.length;
+      }, 1500); // velocidad de salto entre teclas
+    }
+
+    function mostrarCursorEn(indice) {
+      if (cursorActivo) cursorActivo.remove();
+      const tecla = teclasActuales[indice];
+      cursorActivo = document.createElement("div");
+      cursorActivo.className = "cursor";
+      cursorActivo.textContent = "⬤";
+      tecla.appendChild(cursorActivo);
+    }
+
+    function confirmarSeleccionPorMirada() {
+      if (!teclasActuales[indiceActual]) return;
+      const tecla = teclasActuales[indiceActual];
+      const valor = tecla.textContent.trim();
+      if (valor === "borrar") borrarUltimo();
+      else presionarTecla(valor);
+      detenerRecorrido();
+    }
+
+    function detenerRecorrido() {
+      clearInterval(intervaloRecorrido);
+      if (cursorActivo) cursorActivo.remove();
+      cursorActivo = null;
+      teclasActuales = [];
+    }
+
+    
+    //Inicio recorrer el bloque rojo
+
+    async function recorrerBloqueRojo(modelo) {
+      await recorrerLetrasDelBloque(modelo, ['a','e','i','o','u'], "bloque-rojo");
+    }
+    //fin recorrer el bloque rojo
+
+    //Inicio recorrer el bloque morado
+    async function recorrerBloqueMorado(modelo) {
+      await recorrerLetrasDelBloque(modelo, ['q','w','r','t','y','p'], "bloque-morado");
+    }
+    //fin recorrer el bloque morado
+    
+    //Inicio recorrer el bloque amarillo
+    async function recorrerBloqueAmarillo(modelo) {
+      await recorrerLetrasDelBloque(modelo, ['s','d','f','g','h','j','k','l','ñ'], "bloque-amarillo");
+    }
+    
+    //fin recorrer el bloque amarillo
+
+    //Inicio recorrer el bloque verde
+    async function recorrerBloqueVerde(modelo) {
+      await recorrerLetrasDelBloque(modelo, ['z','x','c','v','b','n','m'], "bloque-verde");
+    }
+    
+    //fin recorrer el bloque verde
+
+    //Inicio recorrer el bloque azul
+    async function recorrerBloqueAzul(modelo) {
+      await recorrerLetrasDelBloque(modelo, [' ','borrar',',','?','!','leer'], "bloque-azul");
+    }
+    
+    //fin recorrer el bloque azul
+
+    //Letras del bloque
+    async function recorrerLetrasDelBloque(modelo, letras, bloqueId) {
+      const bloque = document.getElementById(bloqueId);
+      const teclas = Array.from(bloque.querySelectorAll(".tecla"));
+
+      for (let i = 0; i < letras.length; i++) {
+        const letra = letras[i];
+        const tecla = teclas[i];
+
+        if (cursorActivo) cursorActivo.remove();
+        cursorActivo = document.createElement("div");
+        cursorActivo.className = "cursor";
+        cursorActivo.textContent = "⬤";
+        tecla.appendChild(cursorActivo);
+
+        estadoDiv.textContent = `❓ ¿Es ${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`;
+        await reproducirPalabra(`¿Es ${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`);
+        const respuestaLetra = await interpretarMiradaUnaVez(modelo);
+
+        if (respuestaLetra === '1') {
+          if (letra === 'borrar') {
+            borrarUltimo();
+          } else if (letra === 'leer') {
+            leerTextoCompleto();
+          } else {
+            presionarTecla(letra);
+          }
+
+          tecla.style.transform = "scale(0.95)";
+          tecla.style.boxShadow = "inset 0 0 5px rgba(0,0,0,0.3)";
+          estadoDiv.textContent = `✅ ${letra === ' ' ? 'Espacio' : letra.toUpperCase()} seleccionado`;
+          await esperar(1000);
+          tecla.style.transform = "";
+          tecla.style.boxShadow = "";
+          cursorActivo.remove();
+          return;
+        } else {
+          estadoDiv.textContent = `⏭️ No es ${letra.toUpperCase()}`;
+          await esperar(800);
+        }
+
+        cursorActivo.remove();
+      }
+
+      estadoDiv.textContent = "⏹️ No se seleccionó ninguna letra.";
+    }
+    //fin letras del bloque
+    //Bloque de colores
+    async function cicloInteractivoPorMirada(modelo) {
+      while (true) {
+        const opciones = [
+          { pregunta: "¿Vocal?", bloque: recorrerBloqueRojo },
+          { pregunta: "¿Morado?", bloque: recorrerBloqueMorado },
+          { pregunta: "¿Amarillo?", bloque: recorrerBloqueAmarillo },
+          { pregunta: "¿Verde?", bloque: recorrerBloqueVerde },
+          { pregunta: "¿Azul?", bloque: recorrerBloqueAzul }
+        ];
+
+        for (const opcion of opciones) {
+          estadoDiv.textContent = `❓ ${opcion.pregunta}`;
+          await reproducirPalabra(opcion.pregunta);
+          const respuesta = await interpretarMiradaUnaVez(modelo);
+          console.log(`${opcion.pregunta} →`, respuesta);
+
+          if (respuesta === '1') {
+            await opcion.bloque(modelo);
+            break; // 🔁 Salir del ciclo de preguntas tras recorrer un bloque
+          }
+        }
+
+        // 🔁 Reinicia automáticamente
+        estadoDiv.textContent = "🔄 Reiniciando ciclo...";
+        await esperar(1000);
+      }
+    }
+    // fin de bloques de colores
+
+    //Funcion que recorre todos los bloques
+    async function recorrerBloqueConPregunta(modelo, preguntaInicial, letras, bloqueId) {
+      const bloque = document.getElementById(bloqueId);
+      const teclas = Array.from(bloque.querySelectorAll(".tecla"));
+
+      for (let ronda = 0; ronda < 10; ronda++) {
+        estadoDiv.textContent = `❓ ${preguntaInicial}`;
+        await reproducirPalabra(preguntaInicial);
+        const respuesta = await interpretarMiradaUnaVez(modelo);
+        if (respuesta !== '1') {
+          estadoDiv.textContent = "⏭️ Saltando ronda.";
+          await esperar(1000);
+          continue;
+        }
+
+        for (let i = 0; i < letras.length; i++) {
+          const letra = letras[i];
+          const tecla = teclas[i];
+
+          if (cursorActivo) cursorActivo.remove();
+          cursorActivo = document.createElement("div");
+          cursorActivo.className = "cursor";
+          cursorActivo.textContent = "⬤";
+          tecla.appendChild(cursorActivo);
+
+          estadoDiv.textContent = `❓ ¿Es ${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`;
+          await reproducirPalabra(`¿Es ${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`);
+          const respuestaLetra = await interpretarMiradaUnaVez(modelo);
+
+          if (respuestaLetra === '1') {
+            if (letra === 'borrar') borrarUltimo();
+            else presionarTecla(letra);
+            tecla.style.transform = "scale(0.95)";
+            tecla.style.boxShadow = "inset 0 0 5px rgba(0,0,0,0.3)";
+            estadoDiv.textContent = `✅ ${letra === ' ' ? 'Espacio' : letra.toUpperCase()} seleccionado`;
+            await esperar(1000);
+            tecla.style.transform = "";
+            tecla.style.boxShadow = "";
+            cursorActivo.remove();
+            return; // 🔁 Salir del recorrido tras selección
+          }
+        }
+      }
+
+      estadoDiv.textContent = "✅ Secuencia completada";
+    }
+    // fin funcion que recorre todos los bloques
+    // 🔧 CONFIGURACIÓN DE MEDIAPIPE Y CÁMARA
+    const faceMesh = new FaceMesh({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+    });
+
+    faceMesh.setOptions({
+      maxNumFaces: 1,
+      refineLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
+
+    faceMesh.onResults((results) => {
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+      console.log("Y normalizado:", ultimoYNormalizado);
+
+      if (results.multiFaceLandmarks) {
+        const landmarks = results.multiFaceLandmarks[0];
+        drawConnectors(canvasCtx, landmarks, FACEMESH_TESSELATION, { color: '#00FF00', lineWidth: 1 });
+        drawLandmarks(canvasCtx, landmarks, { color: '#FF0000', radius: 1 });
+
+        ultimoYNormalizado = calcularYNormalizado(landmarks);
+        console.log("Y normalizado:", ultimoYNormalizado);
+
+        if (esperaRostro && !flujoIniciado) {
+          flujoIniciado = true;
+          estadoDiv.textContent = "✅ Rostro detectado. Calibrando...";
+          calibrarProbabilistico().then(modelo => {
+            if (!modelo) {
+              estadoDiv.textContent = "🚫 Calibración fallida.";
+              return;
+            }
+            modeloCalibrado = modelo;
+            estadoDiv.textContent = "✅ Calibración completada. Iniciando teclado...";
+            
+            cicloInteractivoPorMirada(modeloCalibrado);
+          });
+        }
+
+        if (modeloCalibrado && ultimoYNormalizado !== null) {
+          const y = ultimoYNormalizado;
+          const pArriba = probabilidadNormal(y, modeloCalibrado.arriba.media, modeloCalibrado.arriba.std);
+          const pAbajo = probabilidadNormal(y, modeloCalibrado.abajo.media, modeloCalibrado.abajo.std);
+          if (pArriba > pAbajo && pArriba > 0.01) {
+            console.log("✅ Mirada hacia arriba detectada → confirmando selección");
+            confirmarSeleccionPorMirada();
+          }
+        }
+      } else {
+        estadoDiv.textContent = "😐 Rostro no detectado";
+        ultimoYNormalizado = null;
+      }
+
+      canvasCtx.restore();
+    });
+
+    const camera = new Camera(videoElement, {
+      onFrame: async () => {
+        await faceMesh.send({ image: videoElement });
+      },
+      width: 480,
+      height: 360
+    });
+
+    camera.start();
+  </script>
+</body>
+</html>
