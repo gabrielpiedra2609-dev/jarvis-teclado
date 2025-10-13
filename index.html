@@ -6,6 +6,8 @@
   <title>Interfaz de Mirada + Calibración + Teclado</title>
 
   <!-- 🔧 PWA: Manifest y Service Worker -->
+  
+
   <link rel="manifest" href="manifest.json">
   <script>
     if ('serviceWorker' in navigator) {
@@ -14,6 +16,7 @@
         .catch(error => console.error("❌ Error al registrar Service Worker:", error));
     }
   </script>
+  
 
   <style>
     body {
@@ -73,11 +76,12 @@
       position: relative;
     }
 
+    .azul    { background-color: #3498DB; }
     .rojo    { background-color: #E74C3C; }
     .morado  { background-color: #8E44AD; }
     .amarillo{ background-color: #F1C40F; color: #333; }
     .verde   { background-color: #27AE60; }
-    .azul    { background-color: #3498DB; }
+    
 
     .cursor {
       position: absolute;
@@ -119,6 +123,15 @@
     <button onclick="borrarTodo()">🗑️ Borrar todo</button>
   </div>
 
+  <!-- 🔵 Bloque azul actualizado -->
+  <div id="bloque-azul" class="bloque">
+    <button class="tecla azul"> </button>
+    <button class="tecla azul">borrar</button>
+    <button class="tecla azul">,</button>
+    <button class="tecla azul">?</button>
+    <button class="tecla azul">!</button>
+    <button class="tecla azul">leer</button>
+  </div>
 
   <!-- 🔴 Bloque rojo: vocales -->
   <div id="bloque-rojo" class="bloque">
@@ -163,15 +176,7 @@
     <button class="tecla verde">m</button>
   </div>
 
-  <!-- 🔵 Bloque azul actualizado -->
-  <div id="bloque-azul" class="bloque">
-    <button class="tecla azul"> </button>
-    <button class="tecla azul">borrar</button>
-    <button class="tecla azul">,</button>
-    <button class="tecla azul">?</button>
-    <button class="tecla azul">!</button>
-    <button class="tecla azul">leer</button>
-  </div>
+  
 
   <!-- 🔷 MÓDULO 4: LIBRERÍAS -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
@@ -423,8 +428,8 @@
         cursorActivo.textContent = "⬤";
         tecla.appendChild(cursorActivo);
 
-        estadoDiv.textContent = `❓ ¿Es ${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`;
-        await reproducirPalabra(`¿Es ${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`);
+        estadoDiv.textContent = `❓ ¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`;
+        await reproducirPalabra(`¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`);
         const respuestaLetra = await interpretarMiradaUnaVez(modelo);
 
         if (respuestaLetra === '1') {
@@ -439,14 +444,14 @@
           tecla.style.transform = "scale(0.95)";
           tecla.style.boxShadow = "inset 0 0 5px rgba(0,0,0,0.3)";
           estadoDiv.textContent = `✅ ${letra === ' ' ? 'Espacio' : letra.toUpperCase()} seleccionado`;
-          await esperar(1000);
+          await esperar(500);
           tecla.style.transform = "";
           tecla.style.boxShadow = "";
           cursorActivo.remove();
           return;
         } else {
           estadoDiv.textContent = `⏭️ No es ${letra.toUpperCase()}`;
-          await esperar(800);
+          await esperar(500);
         }
 
         cursorActivo.remove();
@@ -459,11 +464,11 @@
     async function cicloInteractivoPorMirada(modelo) {
       while (true) {
         const opciones = [
+          { pregunta: "¿Azul?", bloque: recorrerBloqueAzul },
           { pregunta: "¿Vocal?", bloque: recorrerBloqueRojo },
           { pregunta: "¿Morado?", bloque: recorrerBloqueMorado },
           { pregunta: "¿Amarillo?", bloque: recorrerBloqueAmarillo },
-          { pregunta: "¿Verde?", bloque: recorrerBloqueVerde },
-          { pregunta: "¿Azul?", bloque: recorrerBloqueAzul }
+          { pregunta: "¿Verde?", bloque: recorrerBloqueVerde }        
         ];
 
         for (const opcion of opciones) {
@@ -480,7 +485,7 @@
 
         // 🔁 Reinicia automáticamente
         estadoDiv.textContent = "🔄 Reiniciando ciclo...";
-        await esperar(1000);
+        await esperar(500);
       }
     }
     // fin de bloques de colores
@@ -496,7 +501,7 @@
         const respuesta = await interpretarMiradaUnaVez(modelo);
         if (respuesta !== '1') {
           estadoDiv.textContent = "⏭️ Saltando ronda.";
-          await esperar(1000);
+          await esperar(500);
           continue;
         }
 
@@ -510,8 +515,8 @@
           cursorActivo.textContent = "⬤";
           tecla.appendChild(cursorActivo);
 
-          estadoDiv.textContent = `❓ ¿Es ${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`;
-          await reproducirPalabra(`¿Es ${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`);
+          estadoDiv.textContent = `❓ ¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`;
+          await reproducirPalabra(`¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`);
           const respuestaLetra = await interpretarMiradaUnaVez(modelo);
 
           if (respuestaLetra === '1') {
@@ -520,7 +525,7 @@
             tecla.style.transform = "scale(0.95)";
             tecla.style.boxShadow = "inset 0 0 5px rgba(0,0,0,0.3)";
             estadoDiv.textContent = `✅ ${letra === ' ' ? 'Espacio' : letra.toUpperCase()} seleccionado`;
-            await esperar(1000);
+            await esperar(500);
             tecla.style.transform = "";
             tecla.style.boxShadow = "";
             cursorActivo.remove();
