@@ -114,7 +114,7 @@
     <canvas id="canvas" width="480" height="360" style="position: absolute; top: 0; left: 0;"></canvas>
   </div>
   <div id="estado">Esperando inicio...</div>
-  <div id="pantallaInicio"><h2>👋 Toca para comenzar</h2></div>
+  <div id="pantallaInicio"><h2>👋 Toca para comenzar V2.0</h2></div>
 
   <!-- 🔷 MÓDULO 3: TECLADO POR BLOQUES -->
   <textarea id="pantallaTexto" readonly></textarea>
@@ -131,6 +131,8 @@
     <button class="tecla azul">?</button>
     <button class="tecla azul">!</button>
     <button class="tecla azul">leer</button>
+    <button class="tecla azul">pausa</button>
+    <button class="tecla azul">borrartodo</button>
   </div>
 
   <!-- 🔴 Bloque rojo: vocales -->
@@ -202,6 +204,12 @@
     let cursorActivo = null;
     let intervaloRecorrido = null;
 
+    let enPausa = false;
+    let miradaArribaStart = null;
+    let intervaloDeteccion = null;
+
+
+
     // 🔧 AUDIO Y ENTRADA MANUAL
     function verificarAudio() {
       const prueba = new SpeechSynthesisUtterance(" ");
@@ -247,7 +255,107 @@
         document.getElementById("pantallaTexto").value = "";
       }
     }
+    // Interpretacion mirada instantanea para funcion pausa
+    function interpretarMiradaInstantanea(modelo) {
+      if (ultimoYNormalizado === null) return 'x';
+      const pArriba = probabilidadNormal(ultimoYNormalizado, modelo.arriba.media, modelo.arriba.std);
+      const pAbajo = probabilidadNormal(ultimoYNormalizado, modelo.abajo.media, modelo.abajo.std);
+      if (pArriba > pAbajo && pArriba > 0.001) return '1';
+      if (pAbajo > pArriba && pAbajo > 0.001) return '0';
+      return 'x';
+    }
+    
+    //Borrar todo con la mirada
+    async function confirmarBorradoPorMirada() {
+      estadoDiv.textContent = "🗑️ ¿Deseas borrar todo el texto? Mira hacia arriba para confirmar, o hacia abajo para cancelar.";
 
+      let acumuladoArriba = 0;
+      let acumuladoAbajo = 0;
+      const intervalo = 100;
+      const umbral = 4000;
+
+      await reproducirPalabra(`¿Confirmas que quieres borrar todo?`);
+
+
+      while (acumuladoArriba < umbral && acumuladoAbajo < umbral) {
+        const direccion = interpretarMiradaInstantanea(modeloCalibrado);
+        console.log(`🧭 Dirección mirada: ${direccion}`);
+
+        if (direccion === '1') {
+          acumuladoArriba += intervalo;
+          acumuladoAbajo = 0;
+          estadoDiv.textContent = `👁️ Confirmando borrado: ${acumuladoArriba} ms`;
+        } else if (direccion === '0') {
+          acumuladoAbajo += intervalo;
+          acumuladoArriba = 0;
+          estadoDiv.textContent = `🙅 Cancelando borrado: ${acumuladoAbajo} ms`;
+        } else {
+          acumuladoArriba = 0;
+          acumuladoAbajo = 0;
+          estadoDiv.textContent = "🧭 Mirada no clara. Reiniciando confirmación.";
+        }
+
+        await esperar(intervalo);
+      }
+
+      if (acumuladoArriba >= umbral) {
+        document.getElementById("pantallaTexto").value = "";
+        estadoDiv.textContent = "✅ Texto borrado.";
+        await esperar(500);
+      } else if (acumuladoAbajo >= umbral) {
+        estadoDiv.textContent = "❌ Borrado cancelado.";
+        await esperar(500);
+      }
+    }
+
+  // Confirmación completada
+  //document.getElementById("pantallaTexto").value = "";
+  //estadoDiv.textContent = "✅ Texto borrado.";
+//}
+
+
+    // fin Interpretacion mirada instantanea para funcion pausa
+    // funcion pausa
+    async function activarPausa() {
+      if (enPausa) return;
+      enPausa = true;
+      estadoDiv.textContent = "⏸️ Pausa activada. Mira hacia arriba durante 4 segundos para continuar.";
+      await reproducirPalabra(`Por favor, mira hacia arriba por 4 segundos para reiniciar el programa`);
+
+      //detenerLectura?.();
+
+      let acumulado = 0;
+      const intervalo = 100; // milisegundos entre muestras
+      const umbral = 4000;   // tiempo continuo requerido para salir de pausa
+
+      while (enPausa) {
+        const direccion = interpretarMiradaInstantanea(modeloCalibrado);
+        console.log(`🧭 Dirección mirada: ${direccion}`);
+
+        if (direccion === '1') {
+          acumulado += intervalo;
+          estadoDiv.textContent = `👁️ Mirada arriba: ${acumulado} ms`;
+
+          if (acumulado >= umbral) {
+            salirDePausa();
+            break;
+          }
+        } else {
+          acumulado = 0;
+          estadoDiv.textContent = `🧭 Mirada interrumpida. Reiniciando contador.`;
+        }
+
+        await esperar(intervalo);
+      }
+    }
+    function salirDePausa() {
+      enPausa = false;
+      estadoDiv.textContent = "▶️ Pausa desactivada.";
+      //activarTeclado?.();
+      //reanudarLectura?.();
+    }
+
+    // fin funcion pausa
 
     // 🔧 DETECCIÓN Y CALIBRACIÓN
 
@@ -307,9 +415,9 @@
     async function interpretarMiradaUnaVez(modelo) {
       const yVals = [];
       const inicio = Date.now();
-      while (Date.now() - inicio < 3000) {
+      while (Date.now() - inicio < 1020) {
         if (ultimoYNormalizado !== null) yVals.push(ultimoYNormalizado);
-        await esperar(100);
+        await esperar(34);
       }
       if (yVals.length === 0) return 'x';
       const yMedio = yVals.reduce((a, b) => a + b, 0) / yVals.length;
@@ -350,7 +458,7 @@
       intervaloRecorrido = setInterval(() => {
         mostrarCursorEn(indiceActual);
         indiceActual = (indiceActual + 1) % teclasActuales.length;
-      }, 1500); // velocidad de salto entre teclas
+      }, 1000); // velocidad de salto entre teclas
     }
 
     function mostrarCursorEn(indice) {
@@ -408,13 +516,17 @@
 
     //Inicio recorrer el bloque azul
     async function recorrerBloqueAzul(modelo) {
-      await recorrerLetrasDelBloque(modelo, [' ','borrar',',','?','!','leer'], "bloque-azul");
+      await recorrerLetrasDelBloque(modelo, [' ','borrar',',','?','!','leer','pausa','borrartodo'], "bloque-azul");
     }
     
     //fin recorrer el bloque azul
 
     //Letras del bloque
     async function recorrerLetrasDelBloque(modelo, letras, bloqueId) {
+      if (enPausa) {
+        estadoDiv.textContent = "⏸️ En pausa. No se recorrerán letras.";
+        return;
+      }
       const bloque = document.getElementById(bloqueId);
       const teclas = Array.from(bloque.querySelectorAll(".tecla"));
 
@@ -433,12 +545,28 @@
         const respuestaLetra = await interpretarMiradaUnaVez(modelo);
 
         if (respuestaLetra === '1') {
-          if (letra === 'borrar') {
-            borrarUltimo();
-          } else if (letra === 'leer') {
-            leerTextoCompleto();
-          } else {
-            presionarTecla(letra);
+          //if (letra === 'borrar') {
+          //  borrarUltimo();
+          //} else if (letra === 'leer') {
+          //  leerTextoCompleto();
+          //} else {
+          //  presionarTecla(letra);
+          //}
+          switch (letra) {
+            case 'borrar':
+              borrarUltimo();
+              break;
+            case 'borrartodo':
+              await confirmarBorradoPorMirada();
+              break;
+            case 'leer':
+              leerTextoCompleto(); // Asegúrate de tener esta función definida
+              break;
+            case 'pausa':
+              await activarPausa(); // Asegúrate de tener esta función definida
+              break;
+            default:
+              presionarTecla(letra); // Para caracteres normales
           }
 
           tecla.style.transform = "scale(0.95)";
@@ -463,6 +591,12 @@
     //Bloque de colores
     async function cicloInteractivoPorMirada(modelo) {
       while (true) {
+        if (enPausa) {
+          estadoDiv.textContent = "⏸️ En pausa. Esperando reactivación...";
+          await esperar(500); // espera pasiva mientras se detecta mirada arriba
+          continue;
+        }
+
         const opciones = [
           { pregunta: "¿Azul?", bloque: recorrerBloqueAzul },
           { pregunta: "¿Vocal?", bloque: recorrerBloqueRojo },
@@ -475,6 +609,9 @@
           estadoDiv.textContent = `❓ ${opcion.pregunta}`;
           await reproducirPalabra(opcion.pregunta);
           const respuesta = await interpretarMiradaUnaVez(modelo);
+          
+          if (enPausa) break; // si se activó pausa durante esta ronda, salta
+
           console.log(`${opcion.pregunta} →`, respuesta);
 
           if (respuesta === '1') {
@@ -520,12 +657,29 @@
           const respuestaLetra = await interpretarMiradaUnaVez(modelo);
 
           if (respuestaLetra === '1') {
-            if (letra === 'borrar') borrarUltimo();
-            else presionarTecla(letra);
+            //if (letra === 'borrar') borrarUltimo();
+            //else presionarTecla(letra);
             tecla.style.transform = "scale(0.95)";
             tecla.style.boxShadow = "inset 0 0 5px rgba(0,0,0,0.3)";
             estadoDiv.textContent = `✅ ${letra === ' ' ? 'Espacio' : letra.toUpperCase()} seleccionado`;
             await esperar(500);
+            switch (letra) {
+              case 'borrar':
+                borrarUltimo();
+                break;
+              case 'borrartodo':
+                await confirmarBorradoPorMirada();
+                break;
+              case 'leer':
+                leerTextoCompleto(); // Asegúrate de tener esta función definida
+                break;
+              case 'pausa':
+                await activarPausa(); // Asegúrate de tener esta función definida
+                break;
+              default:
+                presionarTecla(letra); // Para caracteres normales
+            }
+
             tecla.style.transform = "";
             tecla.style.boxShadow = "";
             cursorActivo.remove();
@@ -553,7 +707,7 @@
       canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
       canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-      console.log("Y normalizado:", ultimoYNormalizado);
+      //console.log("Y normalizado:", ultimoYNormalizado);
 
       if (results.multiFaceLandmarks) {
         const landmarks = results.multiFaceLandmarks[0];
@@ -561,7 +715,7 @@
         drawLandmarks(canvasCtx, landmarks, { color: '#FF0000', radius: 1 });
 
         ultimoYNormalizado = calcularYNormalizado(landmarks);
-        console.log("Y normalizado:", ultimoYNormalizado);
+        //console.log("Y normalizado:", ultimoYNormalizado);
 
         if (esperaRostro && !flujoIniciado) {
           flujoIniciado = true;
@@ -582,7 +736,7 @@
           const y = ultimoYNormalizado;
           const pArriba = probabilidadNormal(y, modeloCalibrado.arriba.media, modeloCalibrado.arriba.std);
           const pAbajo = probabilidadNormal(y, modeloCalibrado.abajo.media, modeloCalibrado.abajo.std);
-          if (pArriba > pAbajo && pArriba > 0.01) {
+          if (!enPausa && pArriba > pAbajo && pArriba > 0.01) {
             console.log("✅ Mirada hacia arriba detectada → confirmando selección");
             confirmarSeleccionPorMirada();
           }
