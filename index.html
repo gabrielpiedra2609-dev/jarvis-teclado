@@ -375,11 +375,12 @@
       //detenerLectura?.();
 
       let acumulado = 0;
-      const intervalo = 100; // milisegundos entre muestras
-      const umbral = 4000;   // tiempo continuo requerido para salir de pausa
+      const intervalo = 100; // 100 milisegundos entre muestras
+      const umbral = 4000;   // 4000 tiempo continuo requerido para salir de pausa
 
       while (enPausa) {
         const direccion = interpretarMiradaInstantanea(modeloCalibrado);
+        //const direccion = interpretarMiradaUnaVez(modeloCalibrado);
         console.log(`🧭 Dirección mirada: ${direccion}`);
 
         if (direccion === '1') {
