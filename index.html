@@ -114,25 +114,25 @@
     <canvas id="canvas" width="480" height="360" style="position: absolute; top: 0; left: 0;"></canvas>
   </div>
   <div id="estado">Esperando inicio...</div>
-  <div id="pantallaInicio"><h2>👋 Toca para comenzar V2.0</h2></div>
+  <div id="pantallaInicio"><h2>👋 Toca para comenzar V2.1</h2></div>
 
   <!-- 🔷 MÓDULO 3: TECLADO POR BLOQUES -->
   <textarea id="pantallaTexto" readonly></textarea>
   <div style="margin-bottom: 20px;">
     <button onclick="copiarTexto()">📋 Copiar todo</button>
-    <button onclick="borrarTodo()">🗑️ Borrar todo</button>
+    <button onclick="borrarTodo()">🗑️ Vaciar</button>
   </div>
 
   <!-- 🔵 Bloque azul actualizado -->
   <div id="bloque-azul" class="bloque">
     <button class="tecla azul"> </button>
     <button class="tecla azul">borrar</button>
-    <button class="tecla azul">,</button>
-    <button class="tecla azul">?</button>
-    <button class="tecla azul">!</button>
-    <button class="tecla azul">leer</button>
     <button class="tecla azul">pausa</button>
-    <button class="tecla azul">borrartodo</button>
+    <button class="tecla azul">coma</button>
+    <button class="tecla azul">pregunta</button>
+    <button class="tecla azul">leer</button>
+    <button class="tecla azul">copiar</button>
+    <button class="tecla azul">vaciar</button>
   </div>
 
   <!-- 🔴 Bloque rojo: vocales -->
@@ -207,6 +207,8 @@
     let enPausa = false;
     let miradaArribaStart = null;
     let intervaloDeteccion = null;
+    let historial = [];
+
 
 
 
@@ -233,6 +235,14 @@
       estadoDiv.textContent = "📷 Esperando detección facial...";
     });
     // Funcion copiar y borrar todo
+
+    function obtenerTimestamp() {
+      const ahora = new Date();
+      const fecha = ahora.toLocaleDateString('es-EC');
+      const hora = ahora.toLocaleTimeString('es-EC');
+      return `[${fecha} ${hora}]`;
+    }
+
     
     function presionarTecla(tecla) {
       const pantalla = document.getElementById("pantallaTexto");
@@ -248,6 +258,46 @@
       const texto = document.getElementById("pantallaTexto").value;
       navigator.clipboard.writeText(texto)
         .then(() => alert("Texto copiado al portapapeles"));
+    }
+
+    
+
+    function copiarTextoConActivacion() {
+      const texto = document.getElementById("pantallaTexto").value;
+
+      const boton = document.createElement("button");
+      boton.style.position = "absolute";
+      boton.style.opacity = "0";
+      boton.style.pointerEvents = "auto";
+      boton.innerText = "Copiar";
+      document.body.appendChild(boton);
+
+      boton.addEventListener("click", () => {
+        const tempInput = document.createElement("textarea");
+        tempInput.value = texto;
+        tempInput.setAttribute("readonly", "");
+        tempInput.style.position = "absolute";
+        tempInput.style.left = "-9999px";
+        document.body.appendChild(tempInput);
+
+        tempInput.select();
+        const exitoso = document.execCommand("copy");
+        document.body.removeChild(tempInput);
+
+        if (exitoso) {
+          alert("Texto copiado al portapapeles ✅");
+          const linea = `${obtenerTimestamp()} ${texto}`;
+          historial.push(linea);
+          document.getElementById("historialVisual").innerText = historial.join("\n");
+        } else {
+          alert("No se pudo copiar el texto.");
+        }
+
+        boton.remove();
+      });
+
+      // Simula clic inmediato
+      boton.click();
     }
 
     function borrarTodo() {
@@ -415,9 +465,9 @@
     async function interpretarMiradaUnaVez(modelo) {
       const yVals = [];
       const inicio = Date.now();
-      while (Date.now() - inicio < 1020) {
+      while (Date.now() - inicio < 1350) {
         if (ultimoYNormalizado !== null) yVals.push(ultimoYNormalizado);
-        await esperar(34);
+        await esperar(45);
       }
       if (yVals.length === 0) return 'x';
       const yMedio = yVals.reduce((a, b) => a + b, 0) / yVals.length;
@@ -516,7 +566,7 @@
 
     //Inicio recorrer el bloque azul
     async function recorrerBloqueAzul(modelo) {
-      await recorrerLetrasDelBloque(modelo, [' ','borrar',',','?','!','leer','pausa','borrartodo'], "bloque-azul");
+      await recorrerLetrasDelBloque(modelo, [' ','borrar','pausa','coma','pregunta','leer','copiar','vaciar'], "bloque-azul");
     }
     
     //fin recorrer el bloque azul
@@ -543,20 +593,13 @@
         estadoDiv.textContent = `❓ ¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`;
         await reproducirPalabra(`¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`);
         const respuestaLetra = await interpretarMiradaUnaVez(modelo);
-
+        //[' ','borrar','pausa','coma','pregunta','leer','copiar','vaciar']
         if (respuestaLetra === '1') {
-          //if (letra === 'borrar') {
-          //  borrarUltimo();
-          //} else if (letra === 'leer') {
-          //  leerTextoCompleto();
-          //} else {
-          //  presionarTecla(letra);
-          //}
           switch (letra) {
             case 'borrar':
               borrarUltimo();
               break;
-            case 'borrartodo':
+            case 'vaciar':
               await confirmarBorradoPorMirada();
               break;
             case 'leer':
@@ -564,6 +607,15 @@
               break;
             case 'pausa':
               await activarPausa(); // Asegúrate de tener esta función definida
+              break;
+            case 'copiar':
+              await copiarTexto(); // Asegúrate de tener esta función definida
+              break;
+            case 'coma':
+              presionarTecla(','); // Asegúrate de tener esta función definida
+              break;
+            case 'pregunta':
+              presionarTecla('?'); // Asegúrate de tener esta función definida
               break;
             default:
               presionarTecla(letra); // Para caracteres normales
@@ -667,7 +719,7 @@
               case 'borrar':
                 borrarUltimo();
                 break;
-              case 'borrartodo':
+              case 'vaciar':
                 await confirmarBorradoPorMirada();
                 break;
               case 'leer':
@@ -675,6 +727,9 @@
                 break;
               case 'pausa':
                 await activarPausa(); // Asegúrate de tener esta función definida
+                break;
+              case 'copiar':
+                await copiarTexto(); // Asegúrate de tener esta función definida
                 break;
               default:
                 presionarTecla(letra); // Para caracteres normales
