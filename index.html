@@ -466,9 +466,9 @@
     async function interpretarMiradaUnaVez(modelo) {
       const yVals = [];
       const inicio = Date.now();
-      while (Date.now() - inicio < 1350) {
+      while (Date.now() - inicio < 1020) {
         if (ultimoYNormalizado !== null) yVals.push(ultimoYNormalizado);
-        await esperar(45);
+        await esperar(34);
       }
       if (yVals.length === 0) return 'x';
       const yMedio = yVals.reduce((a, b) => a + b, 0) / yVals.length;
@@ -816,4 +816,5 @@
     camera.start();
   </script>
 </body>
+
 </html>
