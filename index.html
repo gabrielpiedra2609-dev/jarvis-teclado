@@ -103,6 +103,34 @@
       align-items: center;
       justify-content: center;
     }
+    
+    #panelHistorial {
+      display: none; /* Oculto inicialmente */
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 300px;
+      height: 100vh;
+      background-color: #f9f9f9;
+      border-left: 2px solid #ccc;
+      padding: 15px;
+      overflow-y: auto;
+      font-family: monospace;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    }
+
+    #panelHistorial h3 {
+      margin-top: 0;
+      font-size: 1.2em;
+      color: #333;
+    }
+
+    #historialVisual {
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.9em;
+      color: #444;
+    }
   </style>
 </head>
 <body>
@@ -114,13 +142,14 @@
     <canvas id="canvas" width="480" height="360" style="position: absolute; top: 0; left: 0;"></canvas>
   </div>
   <div id="estado">Esperando inicio...</div>
-  <div id="pantallaInicio"><h2>👋 Toca para comenzar V2.1</h2></div>
+  <div id="pantallaInicio"><h2>👋 Toca para comenzar V2.2</h2></div>
 
   <!-- 🔷 MÓDULO 3: TECLADO POR BLOQUES -->
   <textarea id="pantallaTexto" readonly></textarea>
   <div style="margin-bottom: 20px;">
     <button onclick="copiarTexto()">📋 Copiar todo</button>
     <button onclick="borrarTodo()">🗑️ Vaciar</button>
+    <button id="toggleHistorialBtn" onclick="toggleHistorial()">Mostrar historial</button>
   </div>
 
   <!-- 🔵 Bloque azul actualizado -->
@@ -130,8 +159,8 @@
     <button class="tecla azul">pausa</button>
     <button class="tecla azul">coma</button>
     <button class="tecla azul">pregunta</button>
+    <button class="tecla azul">enter</button>
     <button class="tecla azul">leer</button>
-    <button class="tecla azul">copiar</button>
     <button class="tecla azul">vaciar</button>
   </div>
 
@@ -177,7 +206,11 @@
     <button class="tecla verde">n</button>
     <button class="tecla verde">m</button>
   </div>
-
+  <!-- 🔷 Pantalla historial -->
+  <div id="panelHistorial">
+    <h3>🕘 Historial</h3>
+    <pre id="historialVisual"></pre>
+  </div>
   
 
   <!-- 🔷 MÓDULO 4: LIBRERÍAS -->
@@ -254,50 +287,128 @@
       pantalla.value = pantalla.value.slice(0, -1);
     }
 
-    function copiarTexto() {
-      const texto = document.getElementById("pantallaTexto").value;
-      navigator.clipboard.writeText(texto)
-        .then(() => alert("Texto copiado al portapapeles"));
+    function toggleHistorial() {
+      const panel = document.getElementById("panelHistorial");
+      const boton = document.getElementById("toggleHistorialBtn");
+
+      if (!panel || !boton) return;
+
+      const visible = panel.style.display !== "none";
+
+      panel.style.display = visible ? "none" : "block";
+      boton.innerText = visible ? "Mostrar historial" : "Ocultar historial";
     }
 
-    
+
+    //function copiarTexto() {
+    //  const texto = document.getElementById("pantallaTexto").value;
+    //  navigator.clipboard.writeText(texto)
+    //    .then(() => alert("Texto copiado al portapapeles"));
+    //}
+    function copiarTexto() {
+      const texto = document.getElementById("pantallaTexto").value || "";
+
+      // Copiar al portapapeles (API moderna)
+      navigator.clipboard.writeText(texto)
+        .then(() => {
+          alert("Texto copiado al portapapeles ✅");
+
+          // Llamar a función adicional para compatibilidad extendida
+          copiarTextoConActivacion();
+
+          // Agregar línea al historial con timestamp
+          const linea = `${obtenerTimestamp()} ${texto}`;
+          if (!window.historial) window.historial = []; // inicializar si no existe
+          window.historial.push(linea);
+
+          // Actualizar panel visual
+          const hv = document.getElementById("historialVisual");
+          if (hv) hv.innerText = window.historial.join("\n");
+
+          // Guardar en memoria local
+          localStorage.setItem("historicoContenido", window.historial.join("\n"));
+        })
+        .catch(err => {
+          console.warn("Error al copiar:", err);
+          alert("No se pudo copiar el texto automáticamente.");
+        });
+    }
 
     function copiarTextoConActivacion() {
-      const texto = document.getElementById("pantallaTexto").value;
+      const historial = localStorage.getItem("historicoContenido") || "";
+      const lineas = historial.trim().split("\n");
+      const ultima = lineas[lineas.length - 1] || "";
 
-      const boton = document.createElement("button");
-      boton.style.position = "absolute";
-      boton.style.opacity = "0";
-      boton.style.pointerEvents = "auto";
-      boton.innerText = "Copiar";
-      document.body.appendChild(boton);
+      // Crear textarea temporal
+      const temp = document.createElement("textarea");
+      temp.value = ultima;
+      temp.setAttribute("readonly", "");
+      temp.style.position = "fixed";
+      temp.style.left = "-9999px";
+      document.body.appendChild(temp);
 
-      boton.addEventListener("click", () => {
-        const tempInput = document.createElement("textarea");
-        tempInput.value = texto;
-        tempInput.setAttribute("readonly", "");
-        tempInput.style.position = "absolute";
-        tempInput.style.left = "-9999px";
-        document.body.appendChild(tempInput);
+      temp.select();
+      const exitoso = document.execCommand("copy");
+      document.body.removeChild(temp);
 
-        tempInput.select();
-        const exitoso = document.execCommand("copy");
-        document.body.removeChild(tempInput);
+      if (exitoso) {
+        mostrarConfirmacion("Última línea copiada ✅");
+      } else {
+        //mostrarTextoManual(ultima);
+      }
 
-        if (exitoso) {
-          alert("Texto copiado al portapapeles ✅");
-          const linea = `${obtenerTimestamp()} ${texto}`;
-          historial.push(linea);
-          document.getElementById("historialVisual").innerText = historial.join("\n");
-        } else {
-          alert("No se pudo copiar el texto.");
-        }
+    }
 
-        boton.remove();
-      });
+    function mostrarConfirmacion(mensaje) {
+      const panel = document.getElementById("confirmacion");
+      if (!panel) return alert(mensaje);
 
-      // Simula clic inmediato
-      boton.click();
+      panel.innerText = mensaje;
+      panel.style.display = "block";
+
+      setTimeout(() => {
+        panel.style.display = "none";
+      }, 3000);
+    }
+
+    function mostrarTextoManual(texto) {
+      const dialog = document.createElement("div");
+      dialog.style.position = "fixed";
+      dialog.style.left = "50%";
+      dialog.style.top = "10%";
+      dialog.style.transform = "translateX(-50%)";
+      dialog.style.background = "#fff";
+      dialog.style.border = "1px solid #ccc";
+      dialog.style.padding = "15px";
+      dialog.style.zIndex = 9999;
+      dialog.style.maxWidth = "80vw";
+      dialog.style.boxShadow = "0 0 10px rgba(0,0,0,0.2)";
+      dialog.style.borderRadius = "8px";
+      dialog.style.fontFamily = "sans-serif";
+
+      const mensaje = document.createElement("p");
+      mensaje.textContent = "No se pudo copiar automáticamente. Puedes copiar manualmente el texto:";
+      mensaje.style.marginBottom = "10px";
+      dialog.appendChild(mensaje);
+
+      const ta = document.createElement("textarea");
+      ta.value = texto;
+      ta.style.width = "100%";
+      ta.style.height = "120px";
+      ta.style.fontSize = "1em";
+      ta.style.marginBottom = "10px";
+      ta.setAttribute("readonly", "");
+      dialog.appendChild(ta);
+
+      const cerrar = document.createElement("button");
+      cerrar.textContent = "Cerrar";
+      cerrar.style.padding = "6px 12px";
+      cerrar.style.fontSize = "1em";
+      cerrar.onclick = () => document.body.removeChild(dialog);
+      dialog.appendChild(cerrar);
+
+      document.body.appendChild(dialog);
+      ta.select();
     }
 
     function borrarTodo() {
@@ -567,7 +678,7 @@
 
     //Inicio recorrer el bloque azul
     async function recorrerBloqueAzul(modelo) {
-      await recorrerLetrasDelBloque(modelo, [' ','borrar','pausa','coma','pregunta','leer','copiar','vaciar'], "bloque-azul");
+      await recorrerLetrasDelBloque(modelo, [' ','borrar','pausa','coma','pregunta','enter','leer','vaciar'], "bloque-azul");
     }
     
     //fin recorrer el bloque azul
@@ -594,7 +705,7 @@
         estadoDiv.textContent = `❓ ¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`;
         await reproducirPalabra(`¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`);
         const respuestaLetra = await interpretarMiradaUnaVez(modelo);
-        //[' ','borrar','pausa','coma','pregunta','leer','copiar','vaciar']
+        //[' ','borrar','pausa','coma','pregunta','leer','enter','vaciar']
         if (respuestaLetra === '1') {
           switch (letra) {
             case 'borrar':
@@ -609,8 +720,10 @@
             case 'pausa':
               await activarPausa(); // Asegúrate de tener esta función definida
               break;
-            case 'copiar':
-              await copiarTexto(); // Asegúrate de tener esta función definida
+            case 'enter':
+              //await copiarTexto(); // Asegúrate de tener esta función definida
+              //await copiarTextoConActivacion();
+              presionarTecla('\n');
               break;
             case 'coma':
               presionarTecla(','); // Asegúrate de tener esta función definida
@@ -729,8 +842,10 @@
               case 'pausa':
                 await activarPausa(); // Asegúrate de tener esta función definida
                 break;
-              case 'copiar':
-                await copiarTexto(); // Asegúrate de tener esta función definida
+              case 'enter':
+                //await copiarTexto(); // Asegúrate de tener esta función definida
+                //await copiarTextoConActivacion();
+                presionarTecla('\n');
                 break;
               default:
                 presionarTecla(letra); // Para caracteres normales
@@ -816,5 +931,4 @@
     camera.start();
   </script>
 </body>
-
 </html>
