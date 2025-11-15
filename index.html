@@ -81,6 +81,8 @@
     .morado  { background-color: #8E44AD; }
     .amarillo{ background-color: #F1C40F; color: #333; }
     .verde   { background-color: #27AE60; }
+    .tomate   { background-color: #FF6347; }
+    .cian    { background-color: #00CED1; color: #333; }
     
 
     .cursor {
@@ -131,6 +133,24 @@
       font-size: 0.9em;
       color: #444;
     }
+    .bloque.tomate {
+      background-color: tomato;
+      padding: 10px;
+      border-radius: 8px;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .tecla.tomate {
+      font-size: 1.5rem;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 6px;
+      background-color: white;
+      color: tomato;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
   </style>
 </head>
 <body>
@@ -142,7 +162,7 @@
     <canvas id="canvas" width="480" height="360" style="position: absolute; top: 0; left: 0;"></canvas>
   </div>
   <div id="estado">Esperando inicio...</div>
-  <div id="pantallaInicio"><h2>👋 Toca para comenzar V2.2</h2></div>
+  <div id="pantallaInicio"><h2>👋 Toca para comenzar V2.3</h2></div>
 
   <!-- 🔷 MÓDULO 3: TECLADO POR BLOQUES -->
   <textarea id="pantallaTexto" readonly></textarea>
@@ -156,14 +176,35 @@
   <div id="bloque-azul" class="bloque">
     <button class="tecla azul"> </button>
     <button class="tecla azul">borrar</button>
-    <button class="tecla azul">pausa</button>
-    <button class="tecla azul">coma</button>
-    <button class="tecla azul">pregunta</button>
     <button class="tecla azul">enter</button>
+    <button class="tecla azul">pausa</button>
+    <button class="tecla azul">signo</button>
     <button class="tecla azul">leer</button>
     <button class="tecla azul">vaciar</button>
+    <button class="tecla azul">numero</button>
   </div>
 
+  <!-- 🍅 Bloque tomate (signos) -->
+<div id="bloque-tomate" class="bloque tomate" style="display: none;">
+  <button class="tecla tomate">punto</button>
+  <button class="tecla tomate">coma</button>
+  <button class="tecla tomate">pregunta</button>
+  <button class="tecla tomate">!</button>
+  <button class="tecla tomate">'</button>
+</div>
+  <!-- Bloque cian (numeros)-->
+<div id="bloque-cian" class="bloque cian" style="display: none;">
+  <button class="tecla cian">0</button>
+  <button class="tecla cian">1</button>
+  <button class="tecla cian">2</button>
+  <button class="tecla cian">3</button>
+  <button class="tecla cian">4</button>
+  <button class="tecla cian">5</button>
+  <button class="tecla cian">6</button>
+  <button class="tecla cian">7</button>
+  <button class="tecla cian">8</button>
+  <button class="tecla cian">9</button>
+</div>
   <!-- 🔴 Bloque rojo: vocales -->
   <div id="bloque-rojo" class="bloque">
     <button class="tecla rojo">a</button>
@@ -241,7 +282,15 @@
     let miradaArribaStart = null;
     let intervaloDeteccion = null;
     let historial = [];
-
+    
+    // 📦 Referencias a bloques del teclado
+    const bloqueTomate = document.getElementById('bloque-tomate');
+    const bloqueCian = document.getElementById('bloque-cian');
+    const bloqueAzul = document.getElementById('bloque-azul');
+    const bloqueRojo = document.getElementById('bloque-rojo');
+    const bloqueMorado = document.getElementById('bloque-morado');
+    const bloqueAmarillo = document.getElementById('bloque-amarillo');
+    const bloqueVerde = document.getElementById('bloque-verde');
 
 
 
@@ -678,10 +727,27 @@
 
     //Inicio recorrer el bloque azul
     async function recorrerBloqueAzul(modelo) {
-      await recorrerLetrasDelBloque(modelo, [' ','borrar','pausa','coma','pregunta','enter','leer','vaciar'], "bloque-azul");
+      await recorrerLetrasDelBloque(modelo, [' ','borrar','enter','pausa','signo','leer','vaciar','numero'], "bloque-azul");
     }
     
     //fin recorrer el bloque azul
+
+    //Inicio recorrer el bloque tomate
+    async function recorrerBloqueTomate(modelo) {
+      bloqueTomate.style.display = 'flex'; // o 'grid' según tu diseño
+      await recorrerLetrasDelBloque(modelo, ['punto','coma','pregunta','afirmacion','apostrofe'], "bloque-tomate");
+      bloqueTomate.style.display = 'none';
+
+    }
+    //fin recorrer el bloque tomate
+    
+    //Inicio recorrer el bloque cian
+    async function recorrerBloqueCian(modelo) {
+      bloqueCian.style.display = 'flex'; // o 'grid' según tu diseño
+      await recorrerLetrasDelBloque(modelo, ['0','1','2','3','4','5','6','7','8','9'], "bloque-cian");
+      bloqueCian.style.display = 'none';
+    } 
+    //fin recorrer el bloque cian
 
     //Letras del bloque
     async function recorrerLetrasDelBloque(modelo, letras, bloqueId) {
@@ -705,7 +771,8 @@
         estadoDiv.textContent = `❓ ¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`;
         await reproducirPalabra(`¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`);
         const respuestaLetra = await interpretarMiradaUnaVez(modelo);
-        //[' ','borrar','pausa','coma','pregunta','leer','enter','vaciar']
+        //[' ','borrar','enter','pausa','signo','leer','vaciar','numero']
+        //['punto','coma','pregunta','afirmacion','apostrofe']
         if (respuestaLetra === '1') {
           switch (letra) {
             case 'borrar':
@@ -731,6 +798,21 @@
             case 'pregunta':
               presionarTecla('?'); // Asegúrate de tener esta función definida
               break;
+            case 'punto':
+              presionarTecla('.'); // Asegúrate de tener esta función definida
+              break;  
+            case 'afirmacion':
+              presionarTecla('!'); // Asegúrate de tener esta función definida        
+              break;
+            case 'apostrofe':
+              presionarTecla('\''); // Asegúrate de tener esta función definida        
+              break;
+            case 'signo':
+              await recorrerBloqueTomate(modelo);
+              break;
+            case 'numero':
+              await recorrerBloqueCian(modelo);
+              break;    
             default:
               presionarTecla(letra); // Para caracteres normales
           }
@@ -843,9 +925,22 @@
                 await activarPausa(); // Asegúrate de tener esta función definida
                 break;
               case 'enter':
-                //await copiarTexto(); // Asegúrate de tener esta función definida
-                //await copiarTextoConActivacion();
                 presionarTecla('\n');
+                break;
+              case 'coma':
+                presionarTecla(','); // Asegúrate de tener esta función definida
+                break;
+              case 'pregunta':
+                presionarTecla('?'); // Asegúrate de tener esta función definida
+                break;
+              case 'punto':
+                presionarTecla('.'); // Asegúrate de tener esta función definida
+                break;  
+              case 'afirmacion':
+                presionarTecla('!'); // Asegúrate de tener esta función definida        
+                break;
+              case 'apostrofe':
+                presionarTecla('\''); // Asegúrate de tener esta función definida        
                 break;
               default:
                 presionarTecla(letra); // Para caracteres normales
@@ -861,6 +956,7 @@
 
       estadoDiv.textContent = "✅ Secuencia completada";
     }
+
     // fin funcion que recorre todos los bloques
     // 🔧 CONFIGURACIÓN DE MEDIAPIPE Y CÁMARA
     const faceMesh = new FaceMesh({
