@@ -185,7 +185,7 @@
     <button class="tecla azul">numero</button>
   </div>
   
-  <!-- 🔵 Bloque blue actualizado -->
+  <!-- 🔵 Bloque blues actualizado -->
   <div id="bloque-azules" class="bloque">
     <button class="tecla azules">para</button>
     <button class="tecla azules">hola</button>
@@ -200,37 +200,38 @@
     <button class="tecla azules">chao</button>
   </div>
 
+
   <!-- 🍅 Bloque tomate (signos) -->
-<div id="bloque-tomate" class="bloque tomate" style="display: none;">
-  <button class="tecla tomate">punto</button>
-  <button class="tecla tomate">coma</button>
-  <button class="tecla tomate">pregunta</button>
-  <button class="tecla tomate">!</button>
-  <button class="tecla tomate">'</button>
-  <button class="tecla tomate">acontilde</button>
-  <button class="tecla tomate">econtilde</button>
-  <button class="tecla tomate">icontilde</button>
-  <button class="tecla tomate">ocontilde</button>
-  <button class="tecla tomate">ucontilde</button>
-  <button class="tecla tomate">carafeliz</button>
-  <button class="tecla tomate">carabeso</button>
-  <button class="tecla tomate">respirar</button>
-  <button class="tecla tomate">corazón</button>
-  <button class="tecla tomate">emoción</button>
-</div>
+  <div id="bloque-tomate" class="bloque tomate" style="display: none;">
+    <button class="tecla tomate">punto</button>
+    <button class="tecla tomate">coma</button>
+    <button class="tecla tomate">pregunta</button>
+    <button class="tecla tomate">!</button>
+    <button class="tecla tomate">acontilde</button>
+    <button class="tecla tomate">econtilde</button>
+    <button class="tecla tomate">icontilde</button>
+    <button class="tecla tomate">ocontilde</button>
+    <button class="tecla tomate">ucontilde</button>
+    <button class="tecla tomate">feliz</button>
+    <button class="tecla tomate">beso</button>
+    <button class="tecla tomate">respirar</button>
+    <button class="tecla tomate">corazón</button>
+    <button class="tecla tomate">emoción</button>
+    <button class="tecla tomate">'</button>
+  </div>
   <!-- Bloque cian (numeros)-->
-<div id="bloque-cian" class="bloque cian" style="display: none;">
-  <button class="tecla cian">0</button>
-  <button class="tecla cian">1</button>
-  <button class="tecla cian">2</button>
-  <button class="tecla cian">3</button>
-  <button class="tecla cian">4</button>
-  <button class="tecla cian">5</button>
-  <button class="tecla cian">6</button>
-  <button class="tecla cian">7</button>
-  <button class="tecla cian">8</button>
-  <button class="tecla cian">9</button>
-</div>
+  <div id="bloque-cian" class="bloque cian" style="display: none;">
+    <button class="tecla cian">0</button>
+    <button class="tecla cian">1</button>
+    <button class="tecla cian">2</button>
+    <button class="tecla cian">3</button>
+    <button class="tecla cian">4</button>
+    <button class="tecla cian">5</button>
+    <button class="tecla cian">6</button>
+    <button class="tecla cian">7</button>
+    <button class="tecla cian">8</button>
+    <button class="tecla cian">9</button>
+  </div>
   <!-- 🔴 Bloque rojo: vocales -->
   <div id="bloque-rojo" class="bloque">
     <button class="tecla rojo">a</button>
@@ -273,7 +274,6 @@
     <button class="tecla verde">n</button>
     <button class="tecla verde">m</button>
   </div>
-
   <!-- 🔷 Pantalla historial -->
   <div id="panelHistorial">
     <h3>🕘 Historial</h3>
@@ -759,7 +759,7 @@
     }
     
     //fin recorrer el bloque azul
-
+    
     //Inicio recorrer el bloque azules
     async function recorrerBloqueAzules(modelo) {
       await recorrerLetrasDelBloque(modelo, ['para','hola','oi','lei','pensar','cancion','bebe','harta','quiero','alzar','chao'], "bloque-azules");
@@ -767,11 +767,10 @@
   
     //fin recorrer el bloque azules
 
-
     //Inicio recorrer el bloque tomate
     async function recorrerBloqueTomate(modelo) {
       bloqueTomate.style.display = 'flex'; // o 'grid' según tu diseño
-      await recorrerLetrasDelBloque(modelo, ['punto','coma','pregunta','afirmacion','apostrofe'], "bloque-tomate");
+      await recorrerLetrasDelBloque(modelo, ['punto','coma','pregunta','exclamación','apostrofe','acontilde','econtilde','icontilde','ocontilde','ucontilde','feliz','beso','respirar','corazón','emoción'], "bloque-tomate");
       bloqueTomate.style.display = 'none';
 
     }
@@ -834,7 +833,7 @@
             case 'punto':
               presionarTecla('.'); // Asegúrate de tener esta función definida
               break;  
-            case 'afirmacion':
+            case 'exclamación':
               presionarTecla('!'); // Asegúrate de tener esta función definida        
               break;
             case 'apostrofe':
@@ -888,10 +887,10 @@
             case 'ucontilde':
               presionarTecla('ú'); // Asegúrate de tener esta función definida        
               break;
-            case 'carafeliz':
-              presionarTecla('😊')'); // Asegúrate de tener esta función definida        
+            case 'feliz':
+              presionarTecla('😊'); // Asegúrate de tener esta función definida        
               break;
-            case 'carabeso':
+            case 'beso':
               presionarTecla('😘'); // Asegúrate de tener esta función definida        
               break;
             case 'respirar':
@@ -911,6 +910,7 @@
               break;
             default:
               presionarTecla(letra); // Para caracteres normales
+
           }
 
           tecla.style.transform = "scale(0.95)";
@@ -1022,8 +1022,6 @@
                 await activarPausa(); // Asegúrate de tener esta función definida
                 break;
               case 'enter':
-                //await copiarTexto(); // Asegúrate de tener esta función definida
-                //await copiarTextoConActivacion();
                 presionarTecla('\n');
                 break;
               case 'coma':
@@ -1035,7 +1033,7 @@
               case 'punto':
                 presionarTecla('.'); // Asegúrate de tener esta función definida
                 break;  
-              case 'afirmacion':
+              case 'exclamación':
                 presionarTecla('!'); // Asegúrate de tener esta función definida        
                 break;
               case 'apostrofe':
@@ -1089,10 +1087,10 @@
               case 'ucontilde':
                 presionarTecla('ú'); // Asegúrate de tener esta función definida        
                 break;
-              case 'carafeliz':
-                presionarTecla('😊')'); // Asegúrate de tener esta función definida        
+              case 'feliz':
+                presionarTecla('😊'); // Asegúrate de tener esta función definida        
                 break;
-              case 'carabeso':
+              case 'beso':
                 presionarTecla('😘'); // Asegúrate de tener esta función definida        
                 break;
               case 'respirar':
@@ -1112,6 +1110,7 @@
                 break;
               default:
                 presionarTecla(letra); // Para caracteres normales
+
             }
 
             tecla.style.transform = "";
