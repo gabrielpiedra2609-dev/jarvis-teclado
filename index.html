@@ -176,10 +176,10 @@
   <!-- 🔵 Bloque azul actualizado -->
   <div id="bloque-azul" class="bloque">
     <button class="tecla azul"> </button>
+    <button class="tecla azul">signo</button>
     <button class="tecla azul">borrar</button>
     <button class="tecla azul">enter</button>
     <button class="tecla azul">pausa</button>
-    <button class="tecla azul">signo</button>
     <button class="tecla azul">leer</button>
     <button class="tecla azul">vaciar</button>
     <button class="tecla azul">numero</button>
@@ -207,6 +207,7 @@
     <button class="tecla tomate">coma</button>
     <button class="tecla tomate">pregunta</button>
     <button class="tecla tomate">!</button>
+    <button class="tecla tomate">nuevalinea</button>
     <button class="tecla tomate">acontilde</button>
     <button class="tecla tomate">econtilde</button>
     <button class="tecla tomate">icontilde</button>
@@ -217,7 +218,6 @@
     <button class="tecla tomate">respirar</button>
     <button class="tecla tomate">corazón</button>
     <button class="tecla tomate">emoción</button>
-    <button class="tecla tomate">'</button>
   </div>
   <!-- Bloque cian (numeros)-->
   <div id="bloque-cian" class="bloque cian" style="display: none;">
@@ -755,7 +755,7 @@
 
     //Inicio recorrer el bloque azul
     async function recorrerBloqueAzul(modelo) {
-      await recorrerLetrasDelBloque(modelo, [' ','borrar','enter','pausa','signo','leer','vaciar','numero'], "bloque-azul");
+      await recorrerLetrasDelBloque(modelo, [' ','signo','borrar','enter','pausa','leer','vaciar','numero'], "bloque-azul");
     }
     
     //fin recorrer el bloque azul
@@ -770,7 +770,7 @@
     //Inicio recorrer el bloque tomate
     async function recorrerBloqueTomate(modelo) {
       bloqueTomate.style.display = 'flex'; // o 'grid' según tu diseño
-      await recorrerLetrasDelBloque(modelo, ['punto','coma','pregunta','exclamación','apostrofe','acontilde','econtilde','icontilde','ocontilde','ucontilde','feliz','beso','respirar','corazón','emoción'], "bloque-tomate");
+      await recorrerLetrasDelBloque(modelo, ['punto','coma','pregunta','exclamación','nuevalinea','acontilde','econtilde','icontilde','ocontilde','ucontilde','feliz','beso','respirar','corazón','emoción'], "bloque-tomate");
       bloqueTomate.style.display = 'none';
 
     }
@@ -836,8 +836,8 @@
             case 'exclamación':
               presionarTecla('!'); // Asegúrate de tener esta función definida        
               break;
-            case 'apostrofe':
-              presionarTecla('\''); // Asegúrate de tener esta función definida        
+            case 'nuevalinea':
+              presionarTecla('\n'); // Asegúrate de tener esta función definida        
               break;
             case 'para':
               presionarTecla('en fin'); // Asegúrate de tener esta función definida        
@@ -1036,8 +1036,8 @@
               case 'exclamación':
                 presionarTecla('!'); // Asegúrate de tener esta función definida        
                 break;
-              case 'apostrofe':
-                presionarTecla('\''); // Asegúrate de tener esta función definida        
+              case 'nuevalinea':
+                presionarTecla('\n'); // Asegúrate de tener esta función definida        
                 break;
               case 'para':
                 presionarTecla('en fin'); // Asegúrate de tener esta función definida        
