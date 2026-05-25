@@ -77,6 +77,7 @@
     }
 
     .azul    { background-color: #3498DB; }
+    .azules    { background-color: #3445db; }
     .rojo    { background-color: #E74C3C; }
     .morado  { background-color: #8E44AD; }
     .amarillo{ background-color: #F1C40F; color: #333; }
@@ -183,6 +184,21 @@
     <button class="tecla azul">vaciar</button>
     <button class="tecla azul">numero</button>
   </div>
+  
+  <!-- 🔵 Bloque blue actualizado -->
+  <div id="bloque-azules" class="bloque">
+    <button class="tecla azules">para</button>
+    <button class="tecla azules">hola</button>
+    <button class="tecla azules">oi</button>
+    <button class="tecla azules">lei</button>
+    <button class="tecla azules">pensar</button>
+    <button class="tecla azules">cancion</button>
+    <button class="tecla azules">bebe</button>
+    <button class="tecla azules">harta</button>
+    <button class="tecla azules">quiero</button>
+    <button class="tecla azules">alzar</button>
+    <button class="tecla azules">chao</button>
+  </div>
 
   <!-- 🍅 Bloque tomate (signos) -->
 <div id="bloque-tomate" class="bloque tomate" style="display: none;">
@@ -191,6 +207,16 @@
   <button class="tecla tomate">pregunta</button>
   <button class="tecla tomate">!</button>
   <button class="tecla tomate">'</button>
+  <button class="tecla tomate">acontilde</button>
+  <button class="tecla tomate">econtilde</button>
+  <button class="tecla tomate">icontilde</button>
+  <button class="tecla tomate">ocontilde</button>
+  <button class="tecla tomate">ucontilde</button>
+  <button class="tecla tomate">carafeliz</button>
+  <button class="tecla tomate">carabeso</button>
+  <button class="tecla tomate">respirar</button>
+  <button class="tecla tomate">corazón</button>
+  <button class="tecla tomate">emoción</button>
 </div>
   <!-- Bloque cian (numeros)-->
 <div id="bloque-cian" class="bloque cian" style="display: none;">
@@ -247,6 +273,7 @@
     <button class="tecla verde">n</button>
     <button class="tecla verde">m</button>
   </div>
+
   <!-- 🔷 Pantalla historial -->
   <div id="panelHistorial">
     <h3>🕘 Historial</h3>
@@ -287,6 +314,7 @@
     const bloqueTomate = document.getElementById('bloque-tomate');
     const bloqueCian = document.getElementById('bloque-cian');
     const bloqueAzul = document.getElementById('bloque-azul');
+    const bloqueAzules = document.getElementById('bloque-azules');
     const bloqueRojo = document.getElementById('bloque-rojo');
     const bloqueMorado = document.getElementById('bloque-morado');
     const bloqueAmarillo = document.getElementById('bloque-amarillo');
@@ -732,6 +760,14 @@
     
     //fin recorrer el bloque azul
 
+    //Inicio recorrer el bloque azules
+    async function recorrerBloqueAzules(modelo) {
+      await recorrerLetrasDelBloque(modelo, ['para','hola','oi','lei','pensar','cancion','bebe','harta','quiero','alzar','chao'], "bloque-azules");
+    }
+  
+    //fin recorrer el bloque azules
+
+
     //Inicio recorrer el bloque tomate
     async function recorrerBloqueTomate(modelo) {
       bloqueTomate.style.display = 'flex'; // o 'grid' según tu diseño
@@ -771,8 +807,7 @@
         estadoDiv.textContent = `❓ ¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`;
         await reproducirPalabra(`¿${letra === ' ' ? 'espacio' : letra.toUpperCase()}?`);
         const respuestaLetra = await interpretarMiradaUnaVez(modelo);
-        //[' ','borrar','enter','pausa','signo','leer','vaciar','numero']
-        //['punto','coma','pregunta','afirmacion','apostrofe']
+        
         if (respuestaLetra === '1') {
           switch (letra) {
             case 'borrar':
@@ -807,12 +842,75 @@
             case 'apostrofe':
               presionarTecla('\''); // Asegúrate de tener esta función definida        
               break;
+            case 'para':
+              presionarTecla('en fin'); // Asegúrate de tener esta función definida        
+              break;
+            case 'hola':
+              presionarTecla('como estás?'); // Asegúrate de tener esta función definida        
+              break;
+            case 'oi':
+              presionarTecla('o justo hoy escuché'); // Asegúrate de tener esta función definida        
+              break;
+            case 'lei':
+              presionarTecla('escuché en un libro increible'); // Asegúrate de tener esta función definida        
+              break;
+            case 'pensar':
+              presionarTecla('estaba pensando'); // Asegúrate de tener esta función definida        
+              break;
+            case 'cancion':
+              presionarTecla('justo hoy oí esta canción'); // Asegúrate de tener esta función definida        
+              break;
+            case 'bebe':
+              presionarTecla('Señor Don Principe Felipe'); // Asegúrate de tener esta función definida        
+              break;
+            case 'harta':
+              presionarTecla('estoy harta'); // Asegúrate de tener esta función definida        
+              break;
+            case 'quiero':
+              presionarTecla('I just wanna tell....'); // Asegúrate de tener esta función definida        
+              break;
+            case 'alzar':
+              presionarTecla('I feel so deeply'); // Asegúrate de tener esta función definida        
+              break;
+            case 'chao':
+              presionarTecla('I love You, good luck!!!'); // Asegúrate de tener esta función definida        
+              break;
+            case 'acontilde':
+              presionarTecla('á'); // Asegúrate de tener esta función definida        
+              break;
+            case 'econtilde':
+              presionarTecla('é'); // Asegúrate de tener esta función definida        
+              break;
+            case 'icontilde':
+              presionarTecla('í'); // Asegúrate de tener esta función definida        
+              break;
+            case 'ocontilde':
+              presionarTecla('ó'); // Asegúrate de tener esta función definida        
+              break;
+            case 'ucontilde':
+              presionarTecla('ú'); // Asegúrate de tener esta función definida        
+              break;
+            case 'carafeliz':
+              presionarTecla('😊')'); // Asegúrate de tener esta función definida        
+              break;
+            case 'carabeso':
+              presionarTecla('😘'); // Asegúrate de tener esta función definida        
+              break;
+            case 'respirar':
+              presionarTecla('😮‍💨'); // Asegúrate de tener esta función definida        
+              break;
+            case 'corazón':
+              presionarTecla('♥'); // Asegúrate de tener esta función definida        
+              break;
+            case 'emoción':
+              presionarTecla('🥹'); // Asegúrate de tener esta función definida        
+              break;
             case 'signo':
               await recorrerBloqueTomate(modelo);
               break;
             case 'numero':
               await recorrerBloqueCian(modelo);
-              break;    
+              break;
             default:
               presionarTecla(letra); // Para caracteres normales
           }
@@ -847,6 +945,7 @@
 
         const opciones = [
           { pregunta: "¿Azul?", bloque: recorrerBloqueAzul },
+          { pregunta: "¿Azules?", bloque: recorrerBloqueAzules },  
           { pregunta: "¿Vocal?", bloque: recorrerBloqueRojo },
           { pregunta: "¿Morado?", bloque: recorrerBloqueMorado },
           { pregunta: "¿Amarillo?", bloque: recorrerBloqueAmarillo },
@@ -925,6 +1024,8 @@
                 await activarPausa(); // Asegúrate de tener esta función definida
                 break;
               case 'enter':
+                //await copiarTexto(); // Asegúrate de tener esta función definida
+                //await copiarTextoConActivacion();
                 presionarTecla('\n');
                 break;
               case 'coma':
@@ -941,6 +1042,75 @@
                 break;
               case 'apostrofe':
                 presionarTecla('\''); // Asegúrate de tener esta función definida        
+                break;
+              case 'para':
+                presionarTecla('en fin'); // Asegúrate de tener esta función definida        
+                break;
+              case 'hola':
+                presionarTecla('como estás?'); // Asegúrate de tener esta función definida        
+                break;
+              case 'oi':
+                presionarTecla('o justo hoy escuché'); // Asegúrate de tener esta función definida        
+                break;
+              case 'lei':
+                presionarTecla('escuché en un libro increible'); // Asegúrate de tener esta función definida        
+                break;
+              case 'pensar':
+                presionarTecla('estaba pensando'); // Asegúrate de tener esta función definida        
+                break;
+              case 'cancion':
+                presionarTecla('justo hoy oí esta canción'); // Asegúrate de tener esta función definida        
+                break;
+              case 'bebe':
+                presionarTecla('Señor Don Principe Felipe'); // Asegúrate de tener esta función definida        
+                break;
+              case 'harta':
+                presionarTecla('estoy harta'); // Asegúrate de tener esta función definida        
+                break;
+              case 'quiero':
+                presionarTecla('I just wanna tell....'); // Asegúrate de tener esta función definida        
+                break;
+              case 'alzar':
+                presionarTecla('I feel so deeply'); // Asegúrate de tener esta función definida        
+                break;
+              case 'chao':
+                presionarTecla('I love You, good luck!!!'); // Asegúrate de tener esta función definida        
+                break;
+              case 'acontilde':
+                presionarTecla('á'); // Asegúrate de tener esta función definida        
+                break;
+              case 'econtilde':
+                presionarTecla('é'); // Asegúrate de tener esta función definida        
+                break;
+              case 'icontilde':
+                presionarTecla('í'); // Asegúrate de tener esta función definida        
+                break;
+              case 'ocontilde':
+                presionarTecla('ó'); // Asegúrate de tener esta función definida        
+                break;
+              case 'ucontilde':
+                presionarTecla('ú'); // Asegúrate de tener esta función definida        
+                break;
+              case 'carafeliz':
+                presionarTecla('😊')'); // Asegúrate de tener esta función definida        
+                break;
+              case 'carabeso':
+                presionarTecla('😘'); // Asegúrate de tener esta función definida        
+                break;
+              case 'respirar':
+                presionarTecla('😮‍💨'); // Asegúrate de tener esta función definida        
+                break;
+              case 'corazón':
+                presionarTecla('♥'); // Asegúrate de tener esta función definida        
+                break;
+              case 'emoción':
+                presionarTecla('🥹'); // Asegúrate de tener esta función definida        
+                break;
+              case 'signo':
+                await recorrerBloqueTomate(modelo);
+                break;
+              case 'numero':
+                await recorrerBloqueCian(modelo);
                 break;
               default:
                 presionarTecla(letra); // Para caracteres normales
