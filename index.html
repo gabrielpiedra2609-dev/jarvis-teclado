@@ -84,7 +84,8 @@
     .verde   { background-color: #27AE60; }
     .tomate   { background-color: #FF6347; }
     .cian    { background-color: #00CED1; color: #333; }
-    
+    .rosa    { background-color: #FF69B4; }
+        
 
     .cursor {
       position: absolute;
@@ -180,24 +181,22 @@
     <button class="tecla azul">borrar</button>
     <button class="tecla azul">enter</button>
     <button class="tecla azul">pausa</button>
-    <button class="tecla azul">leer</button>
-    <button class="tecla azul">vaciar</button>
     <button class="tecla azul">numero</button>
+    <button class="tecla azul">emojis</button>
   </div>
   
   <!-- 🔵 Bloque blues actualizado -->
   <div id="bloque-azules" class="bloque">
-    <button class="tecla azules">para</button>
-    <button class="tecla azules">hola</button>
-    <button class="tecla azules">oi</button>
-    <button class="tecla azules">lei</button>
-    <button class="tecla azules">pensar</button>
-    <button class="tecla azules">cancion</button>
-    <button class="tecla azules">bebe</button>
-    <button class="tecla azules">harta</button>
-    <button class="tecla azules">quiero</button>
-    <button class="tecla azules">alzar</button>
-    <button class="tecla azules">chao</button>
+    <button class="tecla azules">loco</button>
+    <button class="tecla azules">como</button>
+    <button class="tecla azules">creo</button>
+    <button class="tecla azules">mandar</button>
+    <button class="tecla azules">manera</button>
+    <button class="tecla azules">fin</button>
+    <button class="tecla azules">pensando</button>
+    <button class="tecla azules">sabias</button>
+    <button class="tecla azules">escuche</button>
+    <button class="tecla azules">Cristo</button>
   </div>
 
 
@@ -205,19 +204,16 @@
   <div id="bloque-tomate" class="bloque tomate" style="display: none;">
     <button class="tecla tomate">punto</button>
     <button class="tecla tomate">coma</button>
+    <button class="tecla tomate">suspensivo</button>
     <button class="tecla tomate">pregunta</button>
-    <button class="tecla tomate">!</button>
+    <button class="tecla tomate">admiracion</button>
+    <button class="tecla tomate">comillas</button>
     <button class="tecla tomate">nuevalinea</button>
     <button class="tecla tomate">acontilde</button>
     <button class="tecla tomate">econtilde</button>
     <button class="tecla tomate">icontilde</button>
     <button class="tecla tomate">ocontilde</button>
     <button class="tecla tomate">ucontilde</button>
-    <button class="tecla tomate">feliz</button>
-    <button class="tecla tomate">beso</button>
-    <button class="tecla tomate">respirar</button>
-    <button class="tecla tomate">corazón</button>
-    <button class="tecla tomate">emoción</button>
   </div>
   <!-- Bloque cian (numeros)-->
   <div id="bloque-cian" class="bloque cian" style="display: none;">
@@ -274,6 +270,21 @@
     <button class="tecla verde">n</button>
     <button class="tecla verde">m</button>
   </div>
+  <!-- 🟢 Bloque rosa -->
+  <div id="bloque-rosa" class="bloque">
+    <button class="tecla rosa">beso</button>
+    <button class="tecla rosa">bebe</button>
+    <button class="tecla rosa">verguenza</button>
+    <button class="tecla rosa">spock</button>
+    <button class="tecla rosa">amo</button>
+    <button class="tecla rosa">corazon</button>
+    <button class="tecla rosa">suerte</button>
+    <button class="tecla rosa">ojala</button>
+    <button class="tecla rosa">triste</button>
+    <button class="tecla rosa">llanto</button>
+    <button class="tecla rosa">nervios</button>
+  </div>
+  
   <!-- 🔷 Pantalla historial -->
   <div id="panelHistorial">
     <h3>🕘 Historial</h3>
@@ -319,6 +330,7 @@
     const bloqueMorado = document.getElementById('bloque-morado');
     const bloqueAmarillo = document.getElementById('bloque-amarillo');
     const bloqueVerde = document.getElementById('bloque-verde');
+    const bloqueRosa = document.getElementById('bloque-rosa');
 
 
 
@@ -755,14 +767,15 @@
 
     //Inicio recorrer el bloque azul
     async function recorrerBloqueAzul(modelo) {
-      await recorrerLetrasDelBloque(modelo, [' ','signo','borrar','enter','pausa','leer','vaciar','numero'], "bloque-azul");
+      await recorrerLetrasDelBloque(modelo, [' ','signo','borrar','enter','pausa','numero','emojis'], "bloque-azul");
     }
     
     //fin recorrer el bloque azul
     
     //Inicio recorrer el bloque azules
     async function recorrerBloqueAzules(modelo) {
-      await recorrerLetrasDelBloque(modelo, ['para','hola','oi','lei','pensar','cancion','bebe','harta','quiero','alzar','chao'], "bloque-azules");
+      //await recorrerLetrasDelBloque(modelo, ['para','hola','escuche','lei','pensando','cancion','bebe','harta','quiero','alzar','chao','loco','como','creo','mandar','manera','fin','sabias','Cristo'], "bloque-azules");
+      await recorrerLetrasDelBloque(modelo, ['loco','como','creo','mandar','manera','fin','pensando','sabias','escuche','Cristo'], "bloque-azules");
     }
   
     //fin recorrer el bloque azules
@@ -770,7 +783,7 @@
     //Inicio recorrer el bloque tomate
     async function recorrerBloqueTomate(modelo) {
       bloqueTomate.style.display = 'flex'; // o 'grid' según tu diseño
-      await recorrerLetrasDelBloque(modelo, ['punto','coma','pregunta','exclamación','nuevalinea','acontilde','econtilde','icontilde','ocontilde','ucontilde','feliz','beso','respirar','corazón','emoción'], "bloque-tomate");
+      await recorrerLetrasDelBloque(modelo, ['punto','coma','suspensivo','pregunta','admiracion','comillas','exclamación','nuevalinea','acontilde','econtilde','icontilde','ocontilde','ucontilde'], "bloque-tomate");
       bloqueTomate.style.display = 'none';
 
     }
@@ -783,6 +796,13 @@
       bloqueCian.style.display = 'none';
     } 
     //fin recorrer el bloque cian
+
+    //Inicio recorrer el bloque rosa
+    async function recorrerBloqueRosa(modelo) {
+      bloqueRosa.style.display = 'flex'; // o 'grid' según tu diseño
+      await recorrerLetrasDelBloque(modelo, ['beso','bebe','verguenza','spock','amo','corazon','suerte','ojala','triste','llanto','nervios'], "bloque-rosa");
+      bloqueRosa.style.display = 'none';
+    } 
 
     //Letras del bloque
     async function recorrerLetrasDelBloque(modelo, letras, bloqueId) {
@@ -827,9 +847,18 @@
             case 'coma':
               presionarTecla(','); // Asegúrate de tener esta función definida
               break;
+            case 'suspensivo':
+              presionarTecla('...'); // Asegúrate de tener esta función definida
+              break;
             case 'pregunta':
               presionarTecla('?'); // Asegúrate de tener esta función definida
               break;
+            case 'admiracion':
+              presionarTecla('!'); // Asegúrate de tener esta función definida
+              break;
+            case 'comillas':
+              presionarTecla('"'); // Asegúrate de tener esta función definida
+              break;   
             case 'punto':
               presionarTecla('.'); // Asegúrate de tener esta función definida
               break;  
@@ -845,14 +874,14 @@
             case 'hola':
               presionarTecla('como estás?'); // Asegúrate de tener esta función definida        
               break;
-            case 'oi':
-              presionarTecla('o justo hoy escuché'); // Asegúrate de tener esta función definida        
+            case 'escuche':
+              presionarTecla('hoy escuché'); // Asegúrate de tener esta función definida        
               break;
             case 'lei':
               presionarTecla('escuché en un libro increible'); // Asegúrate de tener esta función definida        
               break;
-            case 'pensar':
-              presionarTecla('estaba pensando'); // Asegúrate de tener esta función definida        
+            case 'pensando':
+              presionarTecla('hoy estaba pensando'); // Asegúrate de tener esta función definida        
               break;
             case 'cancion':
               presionarTecla('justo hoy oí esta canción'); // Asegúrate de tener esta función definida        
@@ -871,6 +900,27 @@
               break;
             case 'chao':
               presionarTecla('I love You, good luck!!!'); // Asegúrate de tener esta función definida        
+              break;
+            case 'loco':
+              presionarTecla('algo muy loco'); // Asegúrate de tener esta función definida        
+              break;
+            case 'como':
+              presionarTecla('es como que'); // Asegúrate de tener esta función definida        
+              break;
+            case 'creo':
+              presionarTecla('sabes lo que creo?'); // Asegúrate de tener esta función definida        
+              break;
+            case 'mandar':
+              presionarTecla('solo quiero mandarte'); // Asegúrate de tener esta función definida
+              break;
+            case 'fin':
+              presionarTecla('en fin...'); // Asegúrate de tener esta función definida
+              break;
+            case 'sabias':
+              presionarTecla('sabías que'); // Asegúrate de tener esta función definida
+              break;
+            case 'Cristo':
+              presionarTecla('Dios Cristo Santo'); // Asegúrate de tener esta función definida
               break;
             case 'acontilde':
               presionarTecla('á'); // Asegúrate de tener esta función definida        
@@ -902,12 +952,42 @@
             case 'emoción':
               presionarTecla('🥹'); // Asegúrate de tener esta función definida        
               break;
+            case 'bebe':
+              presionarTecla('🧸'); // Asegúrate de tener esta función definida        
+              break;
+            case 'verguenza':
+              presionarTecla('😳'); // Asegúrate de tener esta función definida        
+              break;  
+            case 'spock':
+              presionarTecla('🖖'); // Asegúrate de tener esta función definida
+              break;
+            case 'amo':
+              presionarTecla('💖'); // Asegúrate de tener esta función definida
+              break;
+            case 'suerte':
+              presionarTecla('🍀'); // Asegúrate de tener esta función definida
+              break;
+            case 'ojala':
+              presionarTecla('🤞'); // Asegúrate de tener esta función definida
+              break;
+            case 'triste':
+              presionarTecla('😢'); // Asegúrate de tener esta función definida
+              break;
+            case 'llanto':
+              presionarTecla('😭'); // Asegúrate de tener esta función definida
+              break;
+            case 'nervios':
+              presionarTecla('😬'); // Asegúrate de tener esta función definida
+              break;
             case 'signo':
               await recorrerBloqueTomate(modelo);
               break;
             case 'numero':
               await recorrerBloqueCian(modelo);
               break;
+            case 'emojis':
+              await recorrerBloqueRosa(modelo);
+              break;  
             default:
               presionarTecla(letra); // Para caracteres normales
 
@@ -1045,13 +1125,13 @@
               case 'hola':
                 presionarTecla('como estás?'); // Asegúrate de tener esta función definida        
                 break;
-              case 'oi':
-                presionarTecla('o justo hoy escuché'); // Asegúrate de tener esta función definida        
+              case 'escuche':
+                presionarTecla('hoy escuché'); // Asegúrate de tener esta función definida        
                 break;
               case 'lei':
                 presionarTecla('escuché en un libro increible'); // Asegúrate de tener esta función definida        
                 break;
-              case 'pensar':
+              case 'pensa':
                 presionarTecla('estaba pensando'); // Asegúrate de tener esta función definida        
                 break;
               case 'cancion':
