@@ -89,7 +89,9 @@
     .magenta { background-color: #FF00FF; }
     .gris    { background-color: #7F8C8D; }
     .turquesa{ background-color: #40E0D0; color: #333; }
-                
+    .pistacho{ background-color: #93C572; color: #333; }
+    .lavanda{ background-color: #E6E6FA; color: #333; }
+                  
 
     .cursor {
       position: absolute;
@@ -168,14 +170,14 @@
     <canvas id="canvas" width="480" height="360" style="position: absolute; top: 0; left: 0;"></canvas>
   </div>
   <div id="estado">Esperando inicio...</div>
-  <div id="pantallaInicio"><h2>👋 Toca para comenzar V2.3</h2></div>
+  <div id="pantallaInicio"><h2>👋 Toca para comenzar V10</h2></div>
 
   <!-- 🔷 MÓDULO 3: TECLADO POR BLOQUES -->
   <textarea id="pantallaTexto" readonly></textarea>
   <div style="margin-bottom: 20px;">
     <button onclick="copiarTexto()">📋 Copiar todo</button>
     <button onclick="borrarTodo()">🗑️ Vaciar</button>
-    <button id="toggleHistorialBtn" onclick="toggleHistorial()">Mostrar historial</button>
+    <button onclick="activarPausa()">⏸️ Pausa</button>
   </div>
 
   <!-- 🔵 Bloque azul actualizado -->
@@ -229,67 +231,115 @@
 
   <!-- 🟠 Bloque naranja (widgets) -->
   <div id="bloque-naranja" class="bloque">
-    <button class="tecla naranja">words</button>
-    <button class="tecla naranja">shortcuts</button>
-    <button class="tecla naranja">Qpalabras</button>
-    <button class="tecla naranja">atajos</button>
+    <button class="tecla naranja">Mini</button>
+    <button class="tecla naranja">Fat</button>
+    <button class="tecla naranja">Big</button>
+    <button class="tecla naranja">Minis</button>
+    <button class="tecla naranja">Gordas</button>
+    <button class="tecla naranja">Grandes</button>
   </div>
 
-  <!-- 🟣 Bloque magenta (words) -->
+  <!-- 🟣 Bloque magenta (Mini) -->
   <div id="bloque-magenta" class="bloque magenta" style="display: none;">
-    <button class="tecla magenta">yesterday</button>
+    <button class="tecla magenta">am</button>
     <button class="tecla magenta">you</button>
-    <button class="tecla magenta">yes</button>
-    <button class="tecla magenta">really</button>
     <button class="tecla magenta">and</button>
-    <button class="tecla magenta">you-know</button>
-    <button class="tecla magenta">that</button>
-    <button class="tecla magenta">wait</button>
-    <button class="tecla magenta">sorry</button>
-    <button class="tecla magenta">because</button>
-    <button class="tecla magenta">incredible</button>
-    <button class="tecla magenta">song</button>
-    <button class="tecla magenta">super</button>
-    <button class="tecla magenta">beautiful</button>    
+    <button class="tecla magenta">the</button>
+    <button class="tecla magenta">so</button>
+    <button class="tecla magenta">well</button>
+    <button class="tecla magenta">yeah</button>
+    <button class="tecla magenta">was</button>
+    <button class="tecla magenta">not</button>
+    <button class="tecla magenta">will</button>
+    <button class="tecla magenta">ing</button>
+    <button class="tecla magenta">can</button>
+    <button class="tecla magenta">did</button>
+    <button class="tecla magenta">yes</button>
+    <button class="tecla magenta">like</button>
+    <button class="tecla magenta">wait</button>        
   </div>
 
-  <!-- 🔵 Bloque gris (shortcuts) -->
+  <!-- 🔵 Bloque gris (Fat) -->
   <div id="bloque-gris" class="bloque gris" style="display: none;">
-    <button class="tecla gris">crazy</button>
-    <button class="tecla gris">like</button>
-    <button class="tecla gris">think</button>
-    <button class="tecla gris">send</button>
-    <button class="tecla gris">end</button>
-    <button class="tecla gris">thinking</button>
+    <button class="tecla gris">that</button>
+    <button class="tecla gris">but</button>
+    <button class="tecla gris">this</button>
+    <button class="tecla gris">why</button>
+    <button class="tecla gris">feel</button>
+    <button class="tecla gris">here</button>
+    <button class="tecla gris">song</button>
+    <button class="tecla gris">what </button>
+    <button class="tecla gris">super</button>
+    <button class="tecla gris">would</button>
+    <button class="tecla gris">really</button>
+    <button class="tecla gris">some</button>
+    <button class="tecla gris">could</button>
     <button class="tecla gris">know</button>
-    <button class="tecla gris">heard </button>
+    <button class="tecla gris">sorry</button>
+    <button class="tecla gris">should</button>
+    <button class="tecla gris">much</button>
   </div>
 
-  <!-- 🟢 Bloque turquesa (Qpalabras) -->
+  <!-- 🟢 Bloque turquesa (Big) -->
   <div id="bloque-turquesa" class="bloque turquesa" style="display: none;">
-    <button class="tecla turquesa">pensando</button>
-    <button class="tecla turquesa">tu</button>
-    <button class="tecla turquesa">ayer</button>
-    <button class="tecla turquesa">realmente</button>
-    <button class="tecla turquesa">que</button>
-    <button class="tecla turquesa">para</button>
-    <button class="tecla turquesa">perdon</button>
-    <button class="tecla turquesa">porque</button>
-    <button class="tecla turquesa">increible</button>
-    <button class="tecla turquesa">hermoso</button>
+    <button class="tecla turquesa">think</button>
+    <button class="tecla turquesa">guess</button>
+    <button class="tecla turquesa">today</button>
+    <button class="tecla turquesa">awful</button>
+    <button class="tecla turquesa">better</button>
+    <button class="tecla turquesa">heard</button>
+    <button class="tecla turquesa">tought</button>
+    <button class="tecla turquesa">very</button>
+    <button class="tecla turquesa">thank</button>
+    <button class="tecla turquesa">allways</button>
+    <button class="tecla turquesa">incredible</button>
+    <button class="tecla turquesa">yesterday</button>
+    <button class="tecla turquesa">send</button>
   </div>
 
-  <!-- 🔵 Bloque blues (atajos) -->
+  <!-- 🔵 Bloque blues (Minis) -->
   <div id="bloque-azules" class="bloque azules" style="display: none;">
-    <button class="tecla azules">como</button>
+    <button class="tecla azules">de</button>
+    <button class="tecla azules">tu</button>
+    <button class="tecla azules">el</button>    
+    <button class="tecla azules">la</button>
+    <button class="tecla azules">yo</button>
+    <button class="tecla azules">las</button>
+    <button class="tecla azules">hoy</button>
+    <button class="tecla azules">que</button>
+    <button class="tecla azules">los</button>
+    <button class="tecla azules">ando</button>
     <button class="tecla azules">creo</button>
-    <button class="tecla azules">cancion</button>    
-    <button class="tecla azules">manera</button>
-    <button class="tecla azules">fin</button>
-    <button class="tecla azules">pensando</button>
-    <button class="tecla azules">escuche</button>
+    <button class="tecla azules">ley</button>
   </div>
-  
+  <!-- 🧩 Bloque pistacho (Gordas) -->  
+  <div id="bloque-pistacho" class="bloque pistacho" style="display: none;">
+    <button class="tecla pistacho">porque</button>
+    <button class="tecla pistacho">para</button>
+    <button class="tecla pistacho">como</button>
+    <button class="tecla pistacho">gracias</button>
+    <button class="tecla pistacho">quiero</button>
+    <button class="tecla pistacho">ayer</button>
+    <button class="tecla pistacho">sabes</button>
+    <button class="tecla pistacho">cacha</button>
+    <button class="tecla pistacho">iendo</button>
+    <button class="tecla pistacho">perdon</button>
+    <button class="tecla pistacho">ñañita</button>
+  </div>
+   <!-- 🎨 Bloque lavanda (Grandes) --> 
+  <div id="bloque-lavanda" class="bloque lavanda" style="display: none;">
+    <button class="tecla lavanda">esta</button>
+    <button class="tecla lavanda">escuche</button>
+    <button class="tecla lavanda">realmente</button>
+    <button class="tecla lavanda">cancion</button>
+    <button class="tecla lavanda">maximo</button>
+    <button class="tecla lavanda">hermoso</button>
+    <button class="tecla lavanda">pensando</button>
+    <button class="tecla lavanda">increible</button>
+    <button class="tecla lavanda">fin</button>
+    <button class="tecla lavanda">tarde</button>
+    <button class="tecla lavanda">enviar</button>
+  </div>
   <!-- 🔴 Bloque rojo: vocales -->
   <div id="bloque-rojo" class="bloque">
     <button class="tecla rojo">a</button>
@@ -385,6 +435,8 @@
     const bloqueMagenta = document.getElementById('bloque-magenta');
     const bloqueGris = document.getElementById('bloque-gris');
     const bloqueTurquesa = document.getElementById('bloque-turquesa');
+    const bloquePistacho = document.getElementById('bloque-pistacho');
+    const bloqueLavanda = document.getElementById('bloque-lavanda');
     
 
     // 🔧 AUDIO Y ENTRADA MANUAL
@@ -622,8 +674,8 @@
     async function activarPausa() {
       if (enPausa) return;
       enPausa = true;
-      estadoDiv.textContent = "⏸️ Pausa activada. Mira hacia arriba durante 4 segundos para continuar.";
-      await reproducirPalabra(`Por favor, mira hacia arriba por 4 segundos para reiniciar el programa`);
+      estadoDiv.textContent = "⏸️ Pausa activada. Mira hacia arriba durante 8 segundos para continuar.";
+      await reproducirPalabra(`Por favor, mira hacia arriba por 8 segundos para reiniciar el programa`);
 
       //detenerLectura?.();
 
@@ -827,38 +879,57 @@
 
     //Inicio recorrer el bloque naranja "widgets"
     async function recorrerBloqueNaranja(modelo) {
-      await recorrerLetrasDelBloque(modelo, ['words','shortcuts','Qpalabras','atajos'], "bloque-naranja");
+      await recorrerLetrasDelBloque(modelo, ['Mini','Fat','Big','Minis','Gordas','Grandes'], "bloque-naranja");
     } 
     //fin recorrer el bloque naranja
 
-    //Inicio recorrer el bloque magenta 'words'
+    //Inicio recorrer el bloque magenta 'Mini'
     async function recorrerBloqueMagenta(modelo) {
       bloqueMagenta.style.display = 'flex'; // o 'grid' según tu diseño
-      await recorrerLetrasDelBloque(modelo, ['yesterday','you','yes','really','and','you-know','that','wait','sorry','because','incredible','song','super','beautiful'], "bloque-magenta");
+      await recorrerLetrasDelBloque(modelo, ['am','you','and','the','so','well','yeah','was','not','will','ing','can','did','yes','like','wait'], "bloque-magenta");
       bloqueMagenta.style.display = 'none'; // Ocultar el bloque después de recorrerlo
     } 
+    //fin recorrer el bloque magenta
     
-    //Inicio recorrer el bloque azules atajos
+    //Inicio recorrer el bloque azules Minis
     async function recorrerBloqueAzules(modelo) {
       bloqueAzules.style.display = 'flex'; // o 'grid' según tu diseño
-      await recorrerLetrasDelBloque(modelo, ['como','creo','cancion','manera','fin','pensando','escuche'], "bloque-azules");
+      await recorrerLetrasDelBloque(modelo, ['de','tu','el','la','yo','las','hoy','que','los','ando','creo','ley'], "bloque-azules");
       bloqueAzules.style.display = 'none'; // Ocultar el bloque después de recorrerlo
     } 
-    //fin recorrer el bloque azules
-
-    //Inicio recorrer el bloque gris shortcuts
+    //fin recorrer el bloque azules 
+    
+    //Inicio recorrer el bloque gris Fat
     async function recorrerBloqueGris(modelo) {
       bloqueGris.style.display = 'flex'; // o 'grid' según tu diseño
-      await recorrerLetrasDelBloque(modelo, ['crazy','like','think','send','end','thinking','know','heard'], "bloque-gris");
+      await recorrerLetrasDelBloque(modelo, ['that','but','this','why','feel','here','song','what','super','would','really','some','could','know','sorry','should','much'], "bloque-gris");
       bloqueGris.style.display = 'none'; // Ocultar el bloque después de recorrerlo
     }
+    //fin recorrer el bloque gris
     
-    //Inicio recorrer el bloque turquesa Qpalabras
+    //Inicio recorrer el bloque turquesa Big
     async function recorrerBloqueTurquesa(modelo) {
       bloqueTurquesa.style.display = 'flex'; // o 'grid' según tu diseño
-      await recorrerLetrasDelBloque(modelo, ['pensando','tu','ayer','realmente','que','para','perdon','porque','increible','hermoso'], "bloque-turquesa");
+      await recorrerLetrasDelBloque(modelo, ['think','guess','today','awful','better','heard','tought','very','thank','allways','incredible','yesterday','send'], "bloque-turquesa");
       bloqueTurquesa.style.display = 'none'; // Ocultar el bloque después de recorrerlo
     }
+    //fin recorrer el bloque turquesa
+    
+    //Inicio recorrer el bloque pistacho Gordas
+    async function recorrerBloquePistacho(modelo) {
+      bloquePistacho.style.display = 'flex'; // o 'grid' según tu diseño
+      await recorrerLetrasDelBloque(modelo, ['porque','para','como','gracias','quiero','ayer','sabes','cacha','iendo','perdon','ñañita'], "bloque-pistacho");
+      bloquePistacho.style.display = 'none'; // Ocultar el bloque después de recorrerlo
+    }
+    //fin recorrer el bloque pistacho
+    
+    //Inicio recorrer el bloque lavanda Grandes
+    async function recorrerBloqueLavanda(modelo) {
+      bloqueLavanda.style.display = 'flex'; // o 'grid' según tu diseño
+      await recorrerLetrasDelBloque(modelo, ['esta','escuche','realmente','cancion','maximo','hermoso','pensando','increible','fin','tarde','enviar'], "bloque-lavanda");
+      bloqueLavanda.style.display = 'none'; // Ocultar el bloque después de recorrerlo
+    }
+    //fin recorrer el bloque lavanda
     
     //Inicio recorrer el bloque tomate
     async function recorrerBloqueTomate(modelo) {
@@ -981,8 +1052,8 @@
             case 'chao':
               presionarTecla('I love You, good luck!!!'); // Asegúrate de tener esta función definida        
               break;
-            case 'loco':
-              presionarTecla('algo muy loco '); // Asegúrate de tener esta función definida        
+            case 'enviar':
+              presionarTecla('quiero mandarte una canción '); // Asegúrate de tener esta función definida        
               break;
             case 'como':
               presionarTecla('es como que'); // Asegúrate de tener esta función definida        
@@ -1071,17 +1142,26 @@
             case 'emojis':
               await recorrerBloqueRosa(modelo);
               break;
-            case 'words':
+            case 'Mini':
               await recorrerBloqueMagenta(modelo);
               break;
-            case 'shortcuts':
+            case 'Minis':
               await recorrerBloqueGris(modelo);
               break;
-            case 'Qpalabras':
+            case 'Fat':
               await recorrerBloqueTurquesa(modelo);
               break;
-            case 'crazy':
-              presionarTecla('something really crazy '); // Asegúrate de tener esta función definida
+            case 'Gordas':
+              await recorrerBloquePistacho(modelo); 
+              break;
+            case 'Big':
+              await recorrerBloqueLavanda(modelo);
+              break;
+            case 'Grandes':
+              await recorrerBloqueAzules(modelo);
+              break;
+            case 'send':
+              presionarTecla('I want to send you a song '); // Asegúrate de tener esta función definida
               break;
             case 'like':
               presionarTecla('It is like '); // Asegúrate de tener esta función definida
@@ -1098,11 +1178,11 @@
             case 'thinking':
               presionarTecla('I was thinking today that '); // Asegúrate de tener esta función
               break;
-            case 'know':
-              presionarTecla('Did you know that '); // Asegúrate de tener esta función definida
+            case 'tarde':
+              presionarTecla('es re tarde '); // Asegúrate de tener esta función definida
               break;
-            case 'heard':
-              presionarTecla('I heard today that'); // Asegúrate de tener esta
+            case 'fin':
+              presionarTecla('en fin'); // Asegúrate de tener esta
               break;     
             default:
               presionarTecla(letra); // Para caracteres normales
